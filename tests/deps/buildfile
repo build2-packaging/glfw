@@ -1,0 +1,9 @@
+./: liba{glad_gl} liba{glad_vulkan} liba{getopt} liba{tinycthread}
+
+liba{glad_gl}: h{glad/gl} c{glad_gl}
+liba{glad_vulkan}: h{glad/vulkan} c{glad_vulkan}
+liba{getopt}: {h c}{getopt}
+liba{tinycthread}: {h c}{tinycthread}
+
+liba{glad*}: c.export.poptions =+ "-I$src_root/deps/" "-I$out_root/deps/"
+obj{glad*}: c.poptions += "-I$src_root/deps/"

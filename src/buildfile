@@ -1,0 +1,104 @@
+# Public headers.
+#
+pub = [dir_path] ../include/GLFW/
+
+include $pub
+
+pub_hdrs = $($pub/pub_hdrs)
+cmn_hdrs = h{internal mappings}
+cmn_srcs = c{context init \
+             input monitor \
+             vulkan window}             
+
+lib{glfw}: $cmn_hdrs $pub_hdrs $cmn_srcs
+
+# Macos
+lib{glfw}: {h c}{cocoa* posix_* ngl_context egl_context osmesa_context}: include = $cocoa
+lib{glfw}: file{cocoa*.m}: include = $cocoa
+
+# Windows
+lib{glfw}: {h c}{win32* ?gl_context osmesa_context}: include = $win32
+
+# Unix - X11
+lib{glfw}: {h c}{x11_* xkb_unicode posix_* linux_joystick \
+                 glx_context egl_context osmesa_context}: include = $usex11
+
+# Unix - Wayland
+lib{glfw}: {h c}{wl_* xkb_unicode posix_* linux_joystick \
+                 egl_context osmesa_context}: include = $usewayland
+
+
+# Build options.
+#
+out_pfx_inc = [dir_path] $out_root/include/
+src_pfx_inc = [dir_path] $src_root/include/
+out_pfx_src = [dir_path] $out_root/src/
+src_pfx_src = [dir_path] $src_root/src/
+
+c.poptions =+   "-I$out_pfx_src" "-I$src_pfx_src" \
+                "-I$out_pfx_inc" "-I$src_pfx_inc"
+
+# Libs
+gl_libs =
+
+# Internal backend selection
+if ($win32)
+{
+  c.poptions += -D_GLFW_WIN32
+  switch $tsys: path.match
+  {
+    case '*msvc*'
+      gl_libs += gdi32.lib
+    default
+      gl_libs += -lgdi32
+  }
+}
+elif ($cocoa)
+{
+  c.poptions += -D_GLFW_COCOA
+  gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundations
+}
+elif ($usewayland)
+  c.poptions += -D_GLFW_WAYLAND
+elif ($usex11)
+{
+  c.poptions += -D_GLFW_X11
+  gl_libs += -lrt -lm -lX11 -lpthread
+}
+elif ($useosmesa)
+  c.poptions += -D_GLFW_OSMESA
+
+if ($hybridhpg)
+  c.poptions += -D_GLFW_USE_HYBRID_HPG
+
+if ($config.glfw.valkan)
+  c.poptions += -D_GLFW_VALKAN_STATIC
+  
+
+obja{*}: c.poptions += -DGLFW_STATIC_BUILD
+objs{*}: c.poptions += -D_GLFW_BUILD_DLL
+
+# Export options
+#
+c.libs += $gl_libs
+lib{glfw}:
+{
+  c.export.poptions = "-I$out_pfx_inc" "-I$src_pfx_inc"
+  c.export.libs = $intf_libs $gl_libs
+}
+
+liba{glfw}: c.export.poptions += -DGLFW_STATIC
+libs{glfw}: c.export.poptions += -D_GLFW_BUILD_DLL
+
+# For pre-releases use the complete version to make sure they cannot be used
+# in place of another pre-release or the final version. See the version module
+# for details on the version.* variable values.
+#
+if $version.pre_release
+  lib{glfw}: bin.lib.version = @"-$version.project_id"
+else
+  lib{glfw}: bin.lib.version = @"-$version.major.$version.minor" windows@"-$version.major"
+
+# Don't install private headers.
+#
+h{*}: install = false

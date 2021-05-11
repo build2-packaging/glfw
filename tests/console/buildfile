@@ -1,0 +1,16 @@
+import libs = glfw%lib{glfw}
+include ../deps/ # Project local
+
+./: exe{clipboard} exe{events} exe{msaa} exe{glfwinfo} \
+    exe{iconify} exe{monitors} exe{reopen} exe{cursor}
+
+exe{clipboard}: c{clipboard} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
+exe{events}: c{events} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
+exe{msaa}: c{msaa} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
+exe{glfwinfo}: c{glfwinfo} ../deps/liba{getopt} ../deps/liba{glad_gl} ../deps/liba{glad_vulkan} $libs
+exe{iconify}: c{iconify} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
+exe{monitors}: c{monitors} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
+exe{cursor}: c{cursor} ../deps/liba{glad_gl} $libs
+exe{reopen}: c{reopen} ../deps/liba{glad_gl} $libs
+
+exe{glfwinfo}: test = true

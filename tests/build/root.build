@@ -1,0 +1,9 @@
+using cc
+using c
+
+c{*}: extension = c
+h{*}: extension = h
+
+# The test target for cross-testing (running tests under Wine, etc).
+#
+test.target = $cxx.target

@@ -1,0 +1,27 @@
+c.std = 99
+
+using cc
+using c
+using in
+
+c{*}: extension = c
+h{*}: extension = h
+
+# The test target for cross-testing (running tests under Wine, etc).
+#
+test.target = $cxx.target
+
+tcls = $cc.target.class
+tsys = $cc.target.system
+
+config [bool] config.glfw.usewayland ?= false
+config [bool] config.glfw.useosmesa ?= false
+config [bool] config.glfw.valkan ?= false
+config [bool] config.glfw.usehybridhpg ?= false
+
+usewayland = ($tcls == 'linux' && $config.glfw.usewayland == true)
+useosmesa = ($tcls == 'linux' && $config.glfw.useosmesa)
+usex11 = ($tcls == 'linux' && !$config.glfw.usewayland)
+win32 = ($tcls == 'windows')
+cocoa = ($tcls == 'macos')
+hybridhpg = ($win32 && $config.glfw.usehybridhpg)
