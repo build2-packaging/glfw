@@ -1,5 +1,3 @@
-./: {*/ -build/ -upstream/} doc{README.md} manifest
+import pkgs = {glfw*/}
 
-# Don't install tests.
-#
-# tests/: install = false
+./: $pkgs

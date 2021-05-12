@@ -1,0 +1,5 @@
+project = glfw-tests
+
+using config
+using test
+using dist
