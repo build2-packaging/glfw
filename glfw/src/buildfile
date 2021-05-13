@@ -17,7 +17,7 @@ cmn_srcs = c{context init \
 lib{glfw}: $cmn_hdrs $pub_hdrs $cmn_srcs
 
 # Macos
-lib{glfw}: {h objectivec}{cocoa* ngl_context}: include = $cocoa
+lib{glfw}: {h objectivec}{cocoa* nsgl_context}: include = $cocoa
 lib{glfw}: {h c}{posix_* egl_context osmesa_context}: include = $cocoa
 
 # Windows

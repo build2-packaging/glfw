@@ -1,14 +1,12 @@
 : 1
-name: glfw
+name: glfw-examples
 version: 3.3.4-a.0.z
-summary: GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
+summary: GLFW examples library
 license: Zlib
 description-file: UPSTREAM.README.md
 url: https://www.glfw.org
 package-url: https://github.com/Swat-SomeBug/glfw.git
 email: swat.somebug@gmail.com
-tests: glfw-tests == $
-examples: glfw-examples == $
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0
 requires: ; OpengGL/Vulkan libraries. Usually installed with system or SDK on Windows.

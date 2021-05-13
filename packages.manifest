@@ -2,3 +2,5 @@
 location: glfw/
 :
 location: glfw-tests/
+:
+location: glfw-examples/

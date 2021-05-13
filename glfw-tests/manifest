@@ -2,13 +2,12 @@
 name: glfw-tests
 version: 3.3.4-a.0.z
 summary: GLFW tests library
-license: zlib
+license: Zlib
 description-file: UPSTREAM.README.md
 url: https://www.glfw.org
 package-url: https://github.com/Swat-SomeBug/glfw.git
 email: swat.somebug@gmail.com
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0
-depends: glfw
 requires: ; OpengGL/Vulkan libraries. Usually installed with system or SDK on Windows.
 requires: ; X11 when building for Linux

@@ -1,0 +1,16 @@
+import libs = glfw%lib{glfw}
+include ./deps/
+
+./: exe{boing} exe{gears} exe{heightmap} exe{offscreen} \
+    exe{particles} exe{sharing} exe{simple} exe{splitview} exe{wave}
+
+exe{boing}: c{boing} $libs deps/liba{glad_gl}
+exe{gears}: c{gears} $libs deps/liba{glad_gl}
+exe{heightmap}: c{heightmap} $libs deps/liba{glad_gl}
+exe{offscreen}: c{offscreen} $libs deps/liba{glad_gl}
+exe{sharing}: c{sharing} $libs deps/liba{glad_gl}
+exe{particles}: c{particles} $libs deps/liba{glad_gl} \
+                deps/liba{tinycthread} deps/liba{getopt}
+exe{simple}: c{simple} $libs deps/liba{glad_gl}
+exe{splitview}: c{splitview} $libs deps/liba{glad_gl}
+exe{wave}: c{wave} $libs deps/liba{glad_gl}
