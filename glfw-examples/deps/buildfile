@@ -1,0 +1,9 @@
+
+./: liba{glad_gl} liba{getopt} liba{tinycthread}
+
+liba{glad_gl}: c{glad_gl} h{glad/gl}
+liba{getopt}: {h c}{getopt}
+liba{tinycthread}: {h c}{tinycthread}
+
+c.poptions += "-I$src_base/"
+liba{glad_gl}: c.export.poptions += "-I$src_base/"
