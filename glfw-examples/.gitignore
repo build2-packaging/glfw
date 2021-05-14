@@ -8,6 +8,10 @@ sharing
 simple
 splitview
 wave
+
+# Output files
+offscreen.png
+
 # Testscript output directories (can be symlinks).
 #
 test
