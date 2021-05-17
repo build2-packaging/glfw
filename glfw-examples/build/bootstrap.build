@@ -3,3 +3,4 @@ project = glfw-examples
 using config
 using test
 using dist
+using version
