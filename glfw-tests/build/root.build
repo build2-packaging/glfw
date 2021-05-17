@@ -4,7 +4,7 @@ using c
 c{*}: extension = c
 h{*}: extension = h
 
-exe{*}: test = true
+exe{*}: install = false
 
 # The test target for cross-testing (running tests under Wine, etc).
 #

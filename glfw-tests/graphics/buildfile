@@ -1,21 +1,13 @@
 import libs = glfw%lib{glfw}
-
 include ../deps/ # Local project import
 
-./: exe{empty} exe{gamma} exe{icon} exe{inputlag} \
-    exe{joysticks} exe{opacity} exe{tearing} \
-    exe{threads} exe{timeout} exe{title} \
-    exe{triangle-vulkan} exe{windows}
+# Order of linking between tinycthread and glfw (with pthread) is important
+libs =+ ../deps/liba{glad_gl} ../deps/liba{tinycthread}
 
-exe{empty}: c{empty} ../deps/liba{tinycthread} ../deps/liba{glad_gl} $libs
-exe{gamma}: h{../deps/nuklear} c{gamma} ../deps/liba{glad_gl} $libs
-exe{icon}: c{icon} ../deps/liba{glad_gl} $libs
-exe{inputlag}: h{../deps/nuklear} c{inputlag} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
-exe{joysticks}: h{../deps/nuklear} c{joysticks} ../deps/liba{glad_gl} $libs
-exe{opacity}: h{../deps/nuklear} c{opacity} ../deps/liba{glad_gl} $libs
-exe{tearing}: c{tearing} ../deps/liba{glad_gl} $libs
-exe{threads}: c{threads} ../deps/liba{tinycthread} ../deps/liba{glad_gl} $libs
-exe{timeout}: c{timeout} ../deps/liba{glad_gl} $libs
-exe{title}: c{title} ../deps/liba{glad_gl} $libs
-exe{triangle-vulkan}: c{triangle-vulkan} ../deps/liba{glad_vulkan} $libs
-exe{windows}: c{windows} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
+for n: empty gamma icon inputlag joysticks opacity tearing \
+        threads timeout title windows
+{
+    ./: exe{$n}: c{$n} $libs
+}
+
+./: exe{triangle-vulkan}: c{triangle-vulkan} ../deps/liba{glad_vulkan} $libs

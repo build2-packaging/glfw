@@ -1,21 +1,16 @@
 import libs = glfw%lib{glfw}
 
-./: exe{boing} exe{gears} exe{heightmap} exe{offscreen} \
-    exe{particles} exe{sharing} exe{simple} exe{splitview} exe{wave}
-
 libue{tinycthread}: {h c}{deps/tinycthread}
 libue{getopt}: {h c}{deps/getopt}
 libue{glad_gl}: c{deps/glad_gl} h{deps/glad/gl}
 
-exe{boing}: c{boing} $libs libue{glad_gl}
-exe{gears}: c{gears} $libs libue{glad_gl}
-exe{heightmap}: c{heightmap} $libs libue{glad_gl}
-exe{offscreen}: c{offscreen} $libs libue{glad_gl}
-exe{sharing}: c{sharing} $libs libue{glad_gl}
-exe{particles}: c{particles} $libs libue{glad_gl} libue{tinycthread} libue{getopt}
-exe{simple}: c{simple} $libs libue{glad_gl}
-exe{splitview}: c{splitview} $libs libue{glad_gl}
-exe{wave}: c{wave} $libs libue{glad_gl}
+for n: boing gears heightmap offscreen particles \
+        sharing simple splitview wave
+{
+    ./: exe{$n}: c{$n} $libs libue{glad_gl}
+}
+
+exe{particles}: libue{tinycthread} libue{getopt}
 
 c.poptions += "-I$src_root/deps/"
 
