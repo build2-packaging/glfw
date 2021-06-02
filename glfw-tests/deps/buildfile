@@ -1,7 +1,7 @@
 ./: liba{glad_gl} liba{glad_vulkan} liba{getopt} liba{tinycthread}
 
-liba{glad_gl}: h{glad/gl} c{glad_gl}
-liba{glad_vulkan}: h{glad/vulkan} c{glad_vulkan}
+liba{glad_gl}: h{**} c{glad_gl}
+liba{glad_vulkan}: h{**} c{glad_vulkan}
 liba{getopt}: {h c}{getopt}
 liba{tinycthread}: {h c}{tinycthread}
 
