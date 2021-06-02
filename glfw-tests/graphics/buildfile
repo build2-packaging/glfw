@@ -2,7 +2,7 @@ import libs = glfw%lib{glfw}
 include ../deps/ # Local project import
 
 # Order of linking between tinycthread and glfw (with pthread) is important
-libs =+ ../deps/liba{glad_gl} ../deps/liba{tinycthread}
+libs =+ ../deps/liba{glad_gl} ../deps/liba{tinycthread} ../deps/liba{getopt}
 
 for n: empty gamma icon inputlag joysticks opacity tearing \
         threads timeout title windows
