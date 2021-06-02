@@ -13,5 +13,5 @@ for n: boing gears heightmap offscreen particles \
 exe{particles}: libue{tinycthread} libue{getopt}
 
 c.poptions += "-I$src_root/deps/"
-
+./: manifest
 exe{*}: install = false
