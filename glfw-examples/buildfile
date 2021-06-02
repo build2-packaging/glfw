@@ -1,8 +1,8 @@
 import libs = glfw%lib{glfw}
 
-libue{tinycthread}: {h c}{deps/tinycthread}
-libue{getopt}: {h c}{deps/getopt}
-libue{glad_gl}: c{deps/glad_gl} h{deps/glad/gl}
+libue{tinycthread}: {h c}{deps/tinycthread} h{**}
+libue{getopt}: {h c}{deps/getopt} h{**}
+libue{glad_gl}: c{deps/glad_gl} h{**}
 
 for n: boing gears heightmap offscreen particles \
         sharing simple splitview wave
