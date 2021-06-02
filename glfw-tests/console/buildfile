@@ -9,3 +9,5 @@ for n: clipboard events msaa glfwinfo \
 
 exe{glfwinfo}: ../deps/liba{glad_vulkan}
 exe{glfwinfo}: test = true
+exe{glfwinfo}: testscript{glfwinfo}
+exe{monitors}: testscript{monitors}
