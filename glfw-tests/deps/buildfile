@@ -7,3 +7,5 @@ liba{tinycthread}: {h c}{tinycthread}
 
 liba{glad*}: c.export.poptions =+ "-I$src_root/deps/" "-I$out_root/deps/"
 obj{glad*}: c.poptions += "-I$src_root/deps/"
+if ($c.target.class == 'windows')
+    c.poptions += -D_CRT_SECURE_NO_WARNINGS

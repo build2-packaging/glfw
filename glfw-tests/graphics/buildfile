@@ -11,3 +11,6 @@ for n: empty gamma icon inputlag joysticks opacity tearing \
 }
 
 ./: exe{triangle-vulkan}: c{triangle-vulkan} ../deps/liba{glad_vulkan} $libs
+
+if ($c.target.class == 'windows')
+    c.poptions += -D_CRT_SECURE_NO_WARNINGS
