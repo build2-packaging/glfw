@@ -74,7 +74,7 @@ elif ($usewayland)
 elif ($usex11)
 {
   c.poptions += -D_GLFW_X11
-  gl_libs += -lrt -lm -lX11 -lpthread
+  gl_libs += -lrt -lm -ldl -lX11 -lpthread
 }
 elif ($useosmesa)
   c.poptions += -D_GLFW_OSMESA
