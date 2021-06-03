@@ -16,7 +16,7 @@ tsys = $cc.target.system
 
 config [bool] config.glfw.usewayland ?= false
 config [bool] config.glfw.useosmesa ?= false
-config [bool] config.glfw.valkan ?= false
+config [bool] config.glfw.vulkan ?= false
 config [bool] config.glfw.usehybridhpg ?= false
 
 usewayland = ($tcls == 'linux' && $config.glfw.usewayland == true)

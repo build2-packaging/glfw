@@ -82,7 +82,7 @@ elif ($useosmesa)
 if ($hybridhpg)
   c.poptions += -D_GLFW_USE_HYBRID_HPG
 
-if ($config.glfw.valkan)
+if ($config.glfw.vulkan)
   c.poptions += -D_GLFW_VALKAN_STATIC
   
 
