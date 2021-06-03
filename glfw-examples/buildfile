@@ -15,3 +15,6 @@ exe{particles}: libue{tinycthread} libue{getopt}
 c.poptions += "-I$src_root/deps/"
 ./: manifest
 exe{*}: install = false
+
+if ($c.target.system == 'windows')
+    c.poptions += -D_CRT_SECURE_NO_WARNINGS

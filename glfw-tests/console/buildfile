@@ -11,3 +11,6 @@ exe{glfwinfo}: ../deps/liba{glad_vulkan}
 exe{glfwinfo}: test = true
 exe{glfwinfo}: testscript{glfwinfo}
 exe{monitors}: testscript{monitors}
+
+if ($c.target.system == 'windows')
+    c.poptions += -D_CRT_SECURE_NO_WARNINGS

@@ -48,7 +48,7 @@ gl_libs =
 # Internal backend selection
 if ($win32)
 {
-  c.poptions += -D_GLFW_WIN32
+  c.poptions += -D_GLFW_WIN32 -D_CRT_SECURE_NO_WARNINGS
   switch $tsys: path.match
   {
     case '*msvc*'
