@@ -1,1 +1,1 @@
-./: {*/ -build/ -basics/} manifest doc{$src_root/../LICENSE.md}
+./: {*/ -build/ -basics/} manifest doc{LICENSE.md}

@@ -1,5 +1,4 @@
-./: {*/ -build/ -upstream/} doc{$src_root/../LICENSE.md $src_root/../UPSTREAM.README.md} manifest
-doc{$src_root/../UPSTREAM.README.md}@./: install = doc/glfw/
+./: {*/ -build/ -upstream/} doc{README.md LICENSE.md} manifest
 
 # Don't install tests.
 #
