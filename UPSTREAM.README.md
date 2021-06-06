@@ -1,1 +1,1 @@
-upstream/README.md
+./upstream/README.md

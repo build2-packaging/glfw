@@ -1,1 +1,1 @@
-upstream/LICENSE.md
+./upstream/LICENSE.md
