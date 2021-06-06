@@ -1,4 +1,4 @@
-./: {*/ -build/ -upstream/} doc{README.md} manifest
+./: {*/ -build/ -upstream/} doc{$src_root/../LICENSE.md $src_root/../UPSTREAM.README.md} manifest
 
 # Don't install tests.
 #

@@ -13,7 +13,7 @@ for n: boing gears heightmap offscreen particles \
 exe{particles}: libue{tinycthread} libue{getopt}
 
 c.poptions += "-I$src_root/deps/"
-./: manifest
+./: manifest doc{$src_root/../LICENSE.md}
 exe{*}: install = false
 
 if ($c.target.class == 'windows')
