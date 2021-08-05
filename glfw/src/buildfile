@@ -1,24 +1,48 @@
 # Public headers.
 #
 
-define objectivec: c
-objectivec{*}: extension = m
-
 pub = [dir_path] ../include/GLFW/
 
 include $pub
 
 pub_hdrs = $($pub/pub_hdrs)
 cmn_hdrs = h{internal mappings}
-cmn_srcs = c{context init \
-             input monitor \
-             vulkan window}             
+cmn_srcs = context.c init.c \
+           input.c monitor.c \
+           vulkan.c window.c             
 
-lib{glfw}: $cmn_hdrs $pub_hdrs $cmn_srcs
+lib{glfw}: $cmn_hdrs $pub_hdrs c{$cmn_srcs}: include = ($cocoa == false)
 
 # Macos
-lib{glfw}: {h objectivec}{cocoa* nsgl_context}: include = $cocoa
-lib{glfw}: {h c}{posix_* egl_context osmesa_context}: include = $cocoa
+# Using adhoc receipes to compile all sources as objective-C files
+# Extensions for files used in variable to allow wildcard filtering
+# Otherwise both header and source code is matched
+#
+cocoa_files = cocoa_*.m nsgl_context.m $cmn_srcs \
+              posix_thread.c cocoa_time.c \
+              egl_context.c osmesa_context.c
+for cocoa_file: $cocoa_files
+{
+  n = $name($cocoa_file)
+  obja{"$n".a.o}: file{"$cocoa_file"}
+  {{
+     diag objective-c ($<[0])
+     $c.path $c.poptions $cc.poptions $c.coptions $cc.coptions\
+     -c $path($<[0]) -o $path($>)
+  }}
+  objs{"$n".dylib.o}: file{"$cocoa_file"}
+  {{
+     diag objective-c ($<[0])
+     $c.path $c.poptions $cc.poptions $c.coptions $cc.coptions\
+     -c $path($<[0]) -o $path($>)
+  }}
+
+  liba{glfw}: obja{"$n".a.o}: include = $cocoa
+  libs{glfw}: objs{"$n".dylib.o}: include = $cocoa
+}
+
+lib{glfw}: h{cocoa* nsgl_context osmesa_context\
+             egl_context posix_thread}: include = $cocoa
 
 # Windows
 lib{glfw}: {h c}{win32* ?gl_context osmesa_context}: include = $win32
@@ -59,15 +83,15 @@ if ($win32)
 }
 elif ($cocoa)
 {
-  switch $cxx.id
+  switch $cxx.id: path.match
   {
-    case '*clang*'
+    case "*clang*"
       c.coptions += -objC
     default
       c.libs += -lobjc
   }
   c.poptions += -D_GLFW_COCOA
-  gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundations
+  gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundation
 }
 elif ($usewayland)
   c.poptions += -D_GLFW_WAYLAND
