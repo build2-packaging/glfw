@@ -11,5 +11,6 @@ tests: glfw-tests == $
 examples: glfw-examples == $
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0
+builds: gcc : -macos ; GCC on macos not supported -> GCC cannot parse cocoa
 requires: ; OpengGL/Vulkan libraries. Usually installed with system or SDK on Windows.
 requires: ; X11 when building for Linux
