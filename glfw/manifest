@@ -3,7 +3,7 @@ name: glfw
 version: 3.3.4-a.0.z
 summary: GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES and Vulkan application development. It provides a simple, platform-independent API for creating windows, contexts and surfaces, reading input, handling events, etc.
 license: Zlib
-description-file: ../UPSTREAM.README.md
+description-file: README.md
 url: https://www.glfw.org
 package-url: https://github.com/Swat-SomeBug/glfw.git
 email: swat.somebug@gmail.com
@@ -11,6 +11,7 @@ tests: glfw-tests == $
 examples: glfw-examples == $
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0
-builds: gcc : -macos ; GCC on macos not supported -> GCC cannot parse cocoa
+builds: default
+build-exclude: macos*-gcc** ; GCC not supported on macos -> Cannot parse Cocoa
 requires: ; OpengGL/Vulkan libraries. Usually installed with system or SDK on Windows.
 requires: ; X11 when building for Linux
