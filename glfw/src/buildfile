@@ -88,7 +88,8 @@ elif ($cocoa)
     case "*clang*"
       c.coptions += -objC
     default
-      c.libs += -lobjc
+      fail "Only clang supported on macos"
+  
   }
   c.poptions += -D_GLFW_COCOA
   gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundation
