@@ -1,6 +1,5 @@
 c.std = 99
 
-using cc
 using c
 using in
 
@@ -11,8 +10,8 @@ h{*}: extension = h
 #
 test.target = $c.target
 
-tcls = $cc.target.class
-tsys = $cc.target.system
+tcls = $c.target.class
+tsys = $c.target.system
 
 config [bool] config.glfw.usewayland ?= false
 config [bool] config.glfw.useosmesa ?= false
