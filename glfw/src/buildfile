@@ -83,7 +83,7 @@ if ($win32)
 }
 elif ($cocoa)
 {
-  switch $cxx.id: path.match
+  switch $c.id: path.match
   {
     case "*clang*"
       c.coptions += -objC
