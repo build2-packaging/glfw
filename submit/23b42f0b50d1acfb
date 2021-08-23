@@ -1,0 +1,5 @@
+: 1
+name: glfw-examples
+version: 3.3.4
+summary: GLFW examples library
+license: Zlib

@@ -1,0 +1,5 @@
+: 1
+name: glfw-tests
+version: 3.3.4
+summary: GLFW tests library
+license: Zlib
