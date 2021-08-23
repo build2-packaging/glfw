@@ -164,8 +164,10 @@ elif ($usex11)
   gl_libs += -lrt -lm -ldl -lX11 -lpthread
 }
 elif ($useosmesa)
+{ 
+  gl_libs += -lOSMesa
   c.poptions += -D_GLFW_OSMESA
-
+}
 if ($hybridhpg)
   c.poptions += -D_GLFW_USE_HYBRID_HPG
 
