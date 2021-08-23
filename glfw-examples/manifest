@@ -1,9 +1,10 @@
 : 1
 name: glfw-examples
-version: 3.3.4-a.0.z
+version: 3.3.4
+project: glfw
 summary: GLFW examples library
 license: Zlib
-description-file: ../UPSTREAM.README.md
+description-file: README.md
 url: https://www.glfw.org
 package-url: https://github.com/Swat-SomeBug/glfw.git
 email: swat.somebug@gmail.com
