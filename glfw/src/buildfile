@@ -95,7 +95,69 @@ elif ($cocoa)
   gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundation
 }
 elif ($usewayland)
+{
   c.poptions += -D_GLFW_WAYLAND
+  gl_libs += -lrt -lm -ldl -lwayland-client -lwayland-cursor -lwayland-egl -lpthread
+  # Require to resolve wayland-protocols and wayland-scanner expected to be installed
+  import! scanner = wayland-scanner%exe{wayland-scanner}
+  import! pkgconfig = pkg-config%exe{pkg-config}
+          
+  lib{glfw}: {h c}{wayland-xdg-shell-client-protocol \
+                   wayland-xdg-decoration-client-protocol \
+                   wayland-viewporter-client-protocol \
+                   wayland-relative-pointer-unstable-v1-client-protocol \
+                   wayland-pointer-constraints-unstable-v1-client-protocol \
+                   wayland-idle-inhibit-unstable-v1-client-protocol}
+                   
+  file{waylandprotocols-path}: $pkgconfig
+  {{
+      diag pkg-config (waylandprotocols)
+      $pkgconfig --variable=pkgdatadir wayland-protocols > $path($>[0])
+  }}
+  <{h c}{wayland-xdg-shell-client-protocol}>: file{waylandprotocols-path} $scanner
+  {{
+      diag wayland-scanner (xdg-shell)
+      cat $path($<[0]) | set waylandprotocols_root
+      $scanner client-header $waylandprotocols_root/stable/xdg-shell/xdg-shell.xml $path($>[0])
+      $scanner private-code $waylandprotocols_root/stable/xdg-shell/xdg-shell.xml $path($>[1])
+  }}
+  <{h c}{wayland-viewporter-client-protocol}>: file{waylandprotocols-path} $scanner
+  {{
+      diag wayland-scanner (viewporter)
+      cat $path($<[0]) | set waylandprotocols_root
+      $scanner client-header $waylandprotocols_root/stable/viewporter/viewporter.xml $path($>[0])
+      $scanner private-code $waylandprotocols_root/stable/viewporter/viewporter.xml $path($>[1])
+  }}
+  <{h c}{wayland-xdg-decoration-client-protocol}>: file{waylandprotocols-path} $scanner
+  {{
+      diag wayland-scanner (xdg-decoration)
+      cat $path($<[0]) | set waylandprotocols_root
+      $scanner client-header $waylandprotocols_root/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml $path($>[0])
+      $scanner private-code $waylandprotocols_root/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml $path($>[1])
+  }}
+  <{h c}{wayland-relative-pointer-unstable-v1-client-protocol}>: file{waylandprotocols-path} $scanner
+  {{
+      diag wayland-scanner (relative-pointer)
+      cat $path($<[0]) | set waylandprotocols_root
+      $scanner client-header $waylandprotocols_root/unstable/relative-pointer/relative-pointer-unstable-v1.xml $path($>[0])
+      $scanner private-code $waylandprotocols_root/unstable/relative-pointer/relative-pointer-unstable-v1.xml $path($>[1])
+  }}
+  <{h c}{wayland-pointer-constraints-unstable-v1-client-protocol}>: file{waylandprotocols-path} $scanner
+  {{
+      diag wayland-scanner (pointer-constraints)
+      cat $path($<[0]) | set waylandprotocols_root
+      $scanner client-header $waylandprotocols_root/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml $path($>[0])
+      $scanner private-code $waylandprotocols_root/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml $path($>[1])
+  }}
+  <{h c}{wayland-idle-inhibit-unstable-v1-client-protocol}>: file{waylandprotocols-path} $scanner
+  {{
+      diag wayland-scanner (idle-inhibit)
+      cat $path($<[0]) | set waylandprotocols_root
+      $scanner client-header $waylandprotocols_root/unstable/idle-inhibit/idle-inhibit-unstable-v1.xml $path($>[0])
+      $scanner private-code $waylandprotocols_root/unstable/idle-inhibit/idle-inhibit-unstable-v1.xml $path($>[1])
+  }}
+  
+}
 elif ($usex11)
 {
   c.poptions += -D_GLFW_X11
@@ -129,11 +191,17 @@ libs{glfw}: c.export.poptions += -D_GLFW_BUILD_DLL
 # For pre-releases use the complete version to make sure they cannot be used
 # in place of another pre-release or the final version. See the version module
 # for details on the version.* variable values.
-#
+# Need to do it this way as windows@.. suffix is not yet supported
+
 if $version.pre_release
   lib{glfw}: bin.lib.version = @"-$version.project_id"
 else
-  lib{glfw}: bin.lib.version = @"-$version.major.$version.minor" windows@"-$version.major"
+{
+  release_version_suffix = "$version.major.$version.minor"
+  if($tcls == 'windows')
+    release_version_suffix = "$version.major"
+  lib{glfw}: bin.lib.version = @"-$release_version_suffix"
+}
 
 # Don't install private headers.
 #
