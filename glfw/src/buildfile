@@ -5,7 +5,7 @@ pub = [dir_path] ../include/GLFW/
 
 include $pub
 
-pub_hdrs = $($pub/pub_hdrs)
+pub_hdrs = $pub/{$($pub/ pub_hdrs)}
 cmn_hdrs = h{internal mappings}
 cmn_srcs = context.c init.c \
            input.c monitor.c \
