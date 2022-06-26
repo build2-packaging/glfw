@@ -8,6 +8,8 @@ jobs:
   Ubuntu:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
+    env:
+      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -55,6 +57,8 @@ jobs:
   Ubuntu-Wayland:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
+    env:
+      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -75,6 +79,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev
       - name: Configure
         run: |
+            bdep init --empty
             bdep config create @cc ../cc cc config.config.load=build-config/${{matrix.config.config_file}}
             bdep init @cc config.glfw.usewayland=true
       - name: Build
@@ -86,6 +91,8 @@ jobs:
   Ubuntu-OSMesa:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
+    env:
+      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -106,6 +113,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev libosmesa6-dev
       - name: Configure
         run: |
+            bdep init --empty
             bdep config create @cc ../cc cc config.config.load=build-config/${{matrix.config.config_file}}
             bdep init @cc config.glfw.osmesa=true
       - name: Build
@@ -117,6 +125,8 @@ jobs:
   Ubuntu-Vulkan:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
+    env:
+      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -137,6 +147,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev
       - name: Configure
         run: |
+            bdep init --empty
             bdep config create @cc ../cc cc config.config.load=build-config/${{matrix.config.config_file}}
             bdep init @cc config.glfw.vulkan=true
       - name: Build
