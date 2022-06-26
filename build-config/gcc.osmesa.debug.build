@@ -1,5 +1,0 @@
-config.version = 1
-config.cxx = g++
-config.cc.coptions = -g
-config.glfw.osmesa = true
-
