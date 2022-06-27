@@ -8,8 +8,6 @@ jobs:
   Ubuntu:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
-    env:
-      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -25,18 +23,6 @@ jobs:
           - name: Ubuntu clang Release
             os: ubuntu-latest
             config_file: clang.release.build
-          - name: Ubuntu gcc Wayland Debug
-            os: ubuntu-latest
-            config_file: gcc.wayland.debug.build
-          - name: Ubuntu gcc Wayland Release
-            os: ubuntu-latest
-            config_file: gcc.wayland.release.build
-          - name: Ubuntu gcc OSMesa Debug
-            os: ubuntu-latest
-            config_file: gcc.osmesa.debug.build
-          - name: Ubuntu gcc OSMesa Release
-            os: ubuntu-latest
-            config_file: gcc.osmesa.release.build
     steps:
       - uses: actions/checkout@v3
         with:
@@ -50,15 +36,11 @@ jobs:
         run: bdep init -C @cc cc config.config.load=build-config/${{matrix.config.config_file}}
       - name: Build
         run: b -V
-      - name: Test
-        run: b -V test
 
   # Job for building on Ubuntu-Wayland
   Ubuntu-Wayland:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
-    env:
-      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -76,7 +58,7 @@ jobs:
         with:
           build2-version: staged
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev
+        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev libwayland-dev wayland-protocols
       - name: Configure
         run: |
             bdep init --empty
@@ -84,15 +66,11 @@ jobs:
             bdep init @cc config.glfw.usewayland=true
       - name: Build
         run: b -V
-      - name: Test
-        run: b -V test
 
   # Job for building on Ubuntu-OSMesa
   Ubuntu-OSMesa:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
-    env:
-      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -125,8 +103,6 @@ jobs:
   Ubuntu-Vulkan:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
-    env:
-      DISPLAY: :0
     strategy:
       matrix:
         config:
@@ -152,8 +128,6 @@ jobs:
             bdep init @cc config.glfw.vulkan=true
       - name: Build
         run: b -V
-      - name: Test
-        run: b -V test
 
   # Job for building on MacOS
   MacOS:
