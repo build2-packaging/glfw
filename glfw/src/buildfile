@@ -169,7 +169,7 @@ elif ($usex11)
 }
 elif ($useosmesa)
 { 
-  gl_libs += -lOSMesa
+  gl_libs += -lrt -lm -ldl -lOSMesa -lpthread
   c.poptions += -D_GLFW_OSMESA
 }
 if ($hybridhpg)

@@ -18,5 +18,5 @@ Uses X11 by default when building on linux. Set `config.glfw.usewayland = true` 
 
 ## Offscreen Rendering
 
-Set `config.glfw.osmesa = true` for Offscreen rendering support and requires `libosmesa` to be installed on the system.\
+Set `config.glfw.osmesa = true` for Offscreen rendering support and requires `libOSMesa` to be installed on the system.\
 Note: It is never expected that `config.glfw.usewayland` and `config.glfw.useosmesa` are true simultenously. In case it does happen, `config.glfw.osmesa` takes precedence over `config.glfw.usewayland`.
