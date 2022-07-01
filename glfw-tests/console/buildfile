@@ -1,18 +1,18 @@
 import libs = glfw%lib{glfw}
 include ../deps/ # Project local
 
-
-
 for n: clipboard events msaa glfwinfo \
         iconify monitors reopen cursor
         {
     ./: exe{$n}: c{$n} ../deps/liba{getopt} ../deps/liba{glad_gl} $libs
   }
   
-  exe{glfwinfo}: ../deps/liba{glad_vulkan}
-  exe{glfwinfo}: test = true
-  exe{glfwinfo}: testscript{glfwinfo}
-  exe{monitors}: testscript{monitors}
+exe{glfwinfo}: ../deps/liba{glad_vulkan}
+exe{glfwinfo}: testscript{glfwinfo}
+
+# Disable monitors test when osmesa is used
+glfw_usesosmesa = $($libs: config.glfw.useosmesa)
+exe{monitors}: testscript{monitors} : include = (!$glfw_usesosmesa)
   
 if ($c.target.class == 'windows')
   c.poptions += -D_CRT_SECURE_NO_WARNINGS
