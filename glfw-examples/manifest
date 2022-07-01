@@ -1,6 +1,6 @@
 : 1
 name: glfw-examples
-version: 3.3.6-a.0.z
+version: 3.3.6
 project: glfw
 summary: GLFW examples library
 license: Zlib

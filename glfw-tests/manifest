@@ -1,6 +1,6 @@
 : 1
 name: glfw-tests
-version: 3.3.6-a.0.z
+version: 3.3.6
 project: glfw
 summary: GLFW tests library
 license: Zlib
