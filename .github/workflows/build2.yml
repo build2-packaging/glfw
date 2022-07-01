@@ -71,8 +71,6 @@ jobs:
   Ubuntu-OSMesa:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
-    env:
-      DISPLAY: :0
     strategy:
       matrix:
         config:

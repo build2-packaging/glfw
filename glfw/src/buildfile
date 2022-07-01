@@ -56,6 +56,10 @@ lib{glfw}: {h c}{wl_* xkb_unicode posix_* linux_joystick \
                  egl_context osmesa_context}: include = $usewayland
 
 
+# Unix - OSMESA
+lib{glfw}: {h c}{null_* posix_* osmesa_context}: include = $useosmesa
+
+
 # Build options.
 #
 out_pfx_inc = [dir_path] $out_root/include/

@@ -18,9 +18,9 @@ config [bool] config.glfw.useosmesa ?= false
 config [bool] config.glfw.vulkan ?= false
 config [bool] config.glfw.usehybridhpg ?= false
 
-usewayland = ($tcls == 'linux' && $config.glfw.usewayland == true)
-useosmesa = ($tcls == 'linux' && $config.glfw.useosmesa)
-usex11 = ($tcls == 'linux' && !$config.glfw.usewayland)
+useosmesa = (($tcls == 'linux' || $tsys == 'freebsd') && $config.glfw.useosmesa)
+usewayland = ($tcls == 'linux' && $config.glfw.usewayland == true && !$config.glfw.useosmesa)
+usex11 = ($tcls == 'linux' && !$config.glfw.usewayland && !$config.glfw.useosmesa)
 win32 = ($tcls == 'windows')
 cocoa = ($tcls == 'macos')
 hybridhpg = ($win32 && $config.glfw.usehybridhpg)
