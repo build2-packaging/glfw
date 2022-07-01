@@ -93,7 +93,7 @@ jobs:
         run: |
             bdep init --empty
             bdep config create @cc ../cc cc config.config.load=build-config/${{matrix.config.config_file}}
-            bdep init @cc config.glfw.osmesa=true
+            bdep init @cc config.glfw.useosmesa=true
       - name: Build
         run: b -V
       - name: Test
