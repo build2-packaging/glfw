@@ -9,10 +9,7 @@ for n: clipboard events msaa glfwinfo \
   
 exe{glfwinfo}: ../deps/liba{glad_vulkan}
 exe{glfwinfo}: testscript{glfwinfo}
-
-# Disable monitors test when osmesa is used
-glfw_usesosmesa = $($libs: config.glfw.useosmesa)
-exe{monitors}: testscript{monitors} : include = (!$glfw_usesosmesa)
+exe{monitors}: testscript{monitors}
   
 if ($c.target.class == 'windows')
   c.poptions += -D_CRT_SECURE_NO_WARNINGS
