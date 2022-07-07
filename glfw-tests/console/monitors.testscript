@@ -1,14 +1,3 @@
 : MONITORS
-$* >>~%EOM%
-%Name\:.+%
-%Current mode\:.+%
-%Virtual position\:.+%
-%Content scale\:.+%
-%Physical size\:.+%
-%Monitor work area\:.+%
-%Modes\:.*%
-%(
-%.*%
-%)*?
-EOM
+$* >- == 0
 
