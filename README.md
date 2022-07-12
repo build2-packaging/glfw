@@ -2,7 +2,11 @@
 
 Build2 package for glfw graphics library
 
-Provides user configuration variables directly in with the build system
+[![build2](https://github.com/build2-packaging/glfw/actions/workflows/build2.yml/badge.svg)](https://github.com/build2-packaging/glfw/actions/workflows/build2.yml)
+
+## Configuration
+
+This package provides user configuration variables directly in with the build system.
 The following configuration variables are current supported:
 
 `config.glfw.osmesa`(default false): Use OSMesa library.\
