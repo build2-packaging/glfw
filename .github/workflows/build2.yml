@@ -40,7 +40,7 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev
       - name: Configure
-        run: bdep init -C @cc cc config.config.load=build-config/${{matrix.config.config_file}}
+        run: bdep init -C ../glfw-build @glfwcfg cc config.config.load=build-config/${{matrix.config.config_file}}
       - name: Build
         run: b -V
 
@@ -69,8 +69,8 @@ jobs:
       - name: Configure
         run: |
             bdep init --empty
-            bdep config create @cc ../cc cc config.config.load=build-config/${{matrix.config.config_file}}
-            bdep init @cc config.glfw.usewayland=true
+            bdep config create @glfwcfg ../glfw-build cc config.config.load=build-config/${{matrix.config.config_file}}
+            bdep init @glfwcfg config.glfw.usewayland=true
       - name: Build
         run: b -V
 
@@ -99,8 +99,8 @@ jobs:
       - name: Configure
         run: |
             bdep init --empty
-            bdep config create @cc ../cc cc config.config.load=build-config/${{matrix.config.config_file}}
-            bdep init @cc config.glfw.useosmesa=true
+            bdep config create @glfwcfg ../glfw-build cc config.config.load=build-config/${{matrix.config.config_file}}
+            bdep init @glfwcfg config.glfw.useosmesa=true
       - name: Build
         run: b -V
       - name: Test
@@ -131,8 +131,8 @@ jobs:
       - name: Configure
         run: |
             bdep init --empty
-            bdep config create @cc ../cc cc config.config.load=build-config/${{matrix.config.config_file}}
-            bdep init @cc config.glfw.vulkan=true
+            bdep config create @glfwcfg ../glfw-build cc config.config.load=build-config/${{matrix.config.config_file}}
+            bdep init @glfwcfg config.glfw.vulkan=true
       - name: Build
         run: b -V
 
@@ -161,7 +161,7 @@ jobs:
       with:
         build2-version: staged
     - name: Configure
-      run: bdep init -C @cc cc config.config.load=build-config/${{matrix.config.config_file}}
+      run: bdep init -C ../glfw-build @glfwcfg cc config.config.load=build-config/${{matrix.config.config_file}}
     - name: Build
       run: b -V
     - name: Test
@@ -203,7 +203,7 @@ jobs:
         build2-version: staged
         build2-windows-compiler: ${{matrix.config.compiler_type}}
     - name: Configure
-      run: bdep init -C @cc cc config.config.load=build-config/${{matrix.config.config_file}}
+      run: bdep init -C ../glfw-build @glfwcfg cc config.config.load=build-config/${{matrix.config.config_file}}
     - name: Build
       run: b -V
     - name: Test
