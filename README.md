@@ -1,26 +1,22 @@
 # glfw
 
-Build2 package for glfw graphics library
+> Note: currently untested on anything apart from Linux.
 
-[![build2](https://github.com/build2-packaging/glfw/actions/workflows/build2.yml/badge.svg)](https://github.com/build2-packaging/glfw/actions/workflows/build2.yml)
+Build2 package for the GLFW graphics library.
+
+<!-- [![build2](/actions/workflows/build2.yml/badge.svg)](/actions/workflows/build2.yml) -->
 
 ## Configuration
 
 This package provides user configuration variables directly in with the build system.
 The following configuration variables are current supported:
 
-`config.glfw.osmesa`(default false): Use OSMesa library.\
-`config.glfw.usewayland`(default false): Use Wayland on Unix systems instead of X11\
-`config.glfw.vulkan`(default false): Statically link with vulkan libraries\
-`config.glfw.usehybridhpg`(default false): Use hybrid high performance graphics card
+- `config.glfw.build_wayland` (default true): Include Wayland support.
+- `config.glfw.build_x11` (default true): Include X11 support.
+- `config.glfw.usehybridhpg` (default false): Use hybrid high performance graphics card.
+<!-- - `config.glfw.vulkan` (default false): Statically link with vulkan libraries -->
 
 
 ## Default setup on Linux
 
-Uses X11 by default when building on linux. Set `config.glfw.usewayland = true` to enable Wayland support. This requires `wayland-scanner` to be installed on the system along with `wayland-protocols`.
-
-
-## Offscreen Rendering
-
-Set `config.glfw.osmesa = true` for Offscreen rendering support and requires `libOSMesa` to be installed on the system.\
-Note: It is never expected that `config.glfw.usewayland` and `config.glfw.useosmesa` are true simultenously. In case it does happen, `config.glfw.osmesa` takes precedence over `config.glfw.usewayland`.
+Uses both X11 and Wayland by default when building on linux. Set `config.glfw.usewayland = true` to enable Wayland support. This requires `wayland-scanner` to be installed on the system (`wayland-protocols` not required).
