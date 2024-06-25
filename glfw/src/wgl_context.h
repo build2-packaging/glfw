@@ -1,1 +1,0 @@
-../../upstream/src/wgl_context.h

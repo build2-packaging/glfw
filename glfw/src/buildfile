@@ -6,59 +6,42 @@ pub = [dir_path] ../include/GLFW/
 include $pub
 
 pub_hdrs = $pub/{$($pub/ pub_hdrs)}
-cmn_hdrs = h{internal mappings}
-cmn_srcs = context.c init.c \
-           input.c monitor.c \
-           vulkan.c window.c             
 
-lib{glfw}: $cmn_hdrs $pub_hdrs c{$cmn_srcs}: include = ($cocoa == false)
-
-# Macos
-# Using adhoc receipes to compile all sources as objective-C files
-# Extensions for files used in variable to allow wildcard filtering
-# Otherwise both header and source code is matched
+# Common sources and headers.
 #
-cocoa_files = cocoa_*.m nsgl_context.m $cmn_srcs \
-              posix_thread.c cocoa_time.c \
-              egl_context.c osmesa_context.c
-for cocoa_file: $cocoa_files
-{
-  n = $name($cocoa_file)
-  obja{"$n".a.o}: file{"$cocoa_file"}
-  {{
-     diag objective-c ($<[0])
-     $c.path $c.poptions $cc.poptions $c.coptions $cc.coptions\
-     -c $path($<[0]) -o $path($>)
-  }}
-  objs{"$n".dylib.o}: file{"$cocoa_file"}
-  {{
-     diag objective-c ($<[0])
-     $c.path $c.poptions $cc.poptions $c.coptions $cc.coptions\
-     -c $path($<[0]) -o $path($>)
-  }}
 
-  liba{glfw}: obja{"$n".a.o}: include = $cocoa
-  libs{glfw}: objs{"$n".dylib.o}: include = $cocoa
-}
+cmn_hdrs = h{internal platform mappings null_platform null_joystick}
+cmn_srcs = c{context init input monitor platform vulkan window egl_context osmesa_context null_init null_monitor null_window null_joystick}
 
-lib{glfw}: h{cocoa* nsgl_context osmesa_context\
-             egl_context posix_thread}: include = $cocoa
+
+lib{glfw}: $cmn_hdrs $pub_hdrs $cmn_srcs
+
+
+# MacOS
+lib{glfw}: m{cocoa_joystick cocoa_monitor cocoa_init cocoa_window nsgl_context} \
+           c{posix_thread posix_module cocoa_time} \
+           h{cocoa_platform cocoa_joystick cocoa_time posix_thread}: include = $cocoa
+
 
 # Windows
-lib{glfw}: {h c}{win32* ?gl_context osmesa_context}: include = $win32
+lib{glfw}: c{win32_joystick win32_monitor win32_window win32_init win32_module wgl_context} \
+           h{win32_joystick win32_platform win32_time win32_thread}: include = $win32
+
+
+# Unix
+lib{glfw}: c{posix_time posix_thread posix_module} h{posix_time posix_thread}: include = $unix
 
 # Unix - X11
-lib{glfw}: {h c}{x11_* xkb_unicode posix_* linux_joystick \
-                 glx_context egl_context osmesa_context}: include = $usex11
+lib{glfw}: c{x11_init x11_monitor x11_window glx_context} h{x11_platform}: include = $build_x11
 
 # Unix - Wayland
-lib{glfw}: {h c}{wl_* xkb_unicode posix_* linux_joystick \
-                 egl_context osmesa_context}: include = $usewayland
+lib{glfw}: c{wl_init wl_monitor wl_window} h{wl_platform}: include = $build_wayland
 
+# Unix - X11 and Wayland
+lib{glfw}: {h c}{posix_poll xkb_unicode}: include = ($build_wayland || $build_x11)
 
-# Unix - OSMESA
-lib{glfw}: {h c}{null_* posix_* osmesa_context}: include = $useosmesa
-
+# Unix - X11 and Wayland - Linux
+lib{glfw}: {h c}{linux_joystick}: include = ($linux && ($build_wayland || $build_x11))
 
 # Build options.
 #
@@ -67,8 +50,7 @@ src_pfx_inc = [dir_path] $src_root/include/
 out_pfx_src = [dir_path] $out_root/src/
 src_pfx_src = [dir_path] $src_root/src/
 
-c.poptions =+   "-I$out_pfx_src" "-I$src_pfx_src" \
-                "-I$out_pfx_inc" "-I$src_pfx_inc"
+c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" "-I$out_pfx_inc" "-I$src_pfx_inc"
 
 # Libs
 gl_libs =
@@ -85,98 +67,115 @@ if ($win32)
       gl_libs += -lgdi32
   }
 }
-elif ($cocoa)
+
+if ($cocoa)
 {
   switch $c.id: path.match
   {
     case "*clang*"
       c.coptions += -objC
     default
-      fail "Only clang supported on macos"
+      fail "Only clang supported on MacOS"
   
   }
   c.poptions += -D_GLFW_COCOA
   gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundation
 }
-elif ($usewayland)
+
+wayland_protos = $src_base/../../upstream/deps/wayland
+
+if ($build_wayland)
 {
-  c.poptions += -D_GLFW_WAYLAND
+  c.poptions += -D_GLFW_WAYLAND -D_DEFAULT_SOURCE
   gl_libs += -lrt -lm -ldl -lwayland-client -lwayland-cursor -lwayland-egl -lpthread
-  # Require to resolve wayland-protocols and wayland-scanner expected to be installed
   import! scanner = wayland-scanner%exe{wayland-scanner}
-  import! pkgconfig = pkg-config%exe{pkg-config}
           
-  lib{glfw}: {h c}{wayland-xdg-shell-client-protocol \
-                   wayland-xdg-decoration-client-protocol \
-                   wayland-viewporter-client-protocol \
-                   wayland-relative-pointer-unstable-v1-client-protocol \
-                   wayland-pointer-constraints-unstable-v1-client-protocol \
-                   wayland-idle-inhibit-unstable-v1-client-protocol}
-                   
-  file{waylandprotocols-path}: $pkgconfig
+  lib{glfw}: h{wayland-client-protocol \
+                   wayland-client-protocol-code \
+                   viewporter-client-protocol \
+                   viewporter-client-protocol-code \
+                   xdg-shell-client-protocol \
+                   xdg-shell-client-protocol-code \
+                   idle-inhibit-unstable-v1-client-protocol \
+                   idle-inhibit-unstable-v1-client-protocol-code \
+                   pointer-constraints-unstable-v1-client-protocol \
+                   pointer-constraints-unstable-v1-client-protocol-code \
+                   relative-pointer-unstable-v1-client-protocol \
+                   relative-pointer-unstable-v1-client-protocol-code \
+                   fractional-scale-v1-client-protocol \
+                   fractional-scale-v1-client-protocol-code \
+                   xdg-activation-v1-client-protocol \
+                   xdg-activation-v1-client-protocol-code \
+                   xdg-decoration-unstable-v1-client-protocol \
+                   xdg-decoration-unstable-v1-client-protocol-code}
+  <h{wayland-client-protocol} h{wayland-client-protocol-code}>: $scanner
   {{
-      diag pkg-config (waylandprotocols)
-      $pkgconfig --variable=pkgdatadir wayland-protocols > $path($>[0])
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/wayland.xml $path($>[0])
+    $scanner private-code  $wayland_protos/wayland.xml $path($>[1])
   }}
-  <{h c}{wayland-xdg-shell-client-protocol}>: file{waylandprotocols-path} $scanner
+  <h{viewporter-client-protocol} h{viewporter-client-protocol-code}>: $scanner
   {{
-      diag wayland-scanner (xdg-shell)
-      cat $path($<[0]) | set waylandprotocols_root
-      $scanner client-header $waylandprotocols_root/stable/xdg-shell/xdg-shell.xml $path($>[0])
-      $scanner private-code $waylandprotocols_root/stable/xdg-shell/xdg-shell.xml $path($>[1])
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/viewporter.xml $path($>[0])
+    $scanner private-code  $wayland_protos/viewporter.xml $path($>[1])
   }}
-  <{h c}{wayland-viewporter-client-protocol}>: file{waylandprotocols-path} $scanner
+  <h{xdg-shell-client-protocol} h{xdg-shell-client-protocol-code}>: $scanner
   {{
-      diag wayland-scanner (viewporter)
-      cat $path($<[0]) | set waylandprotocols_root
-      $scanner client-header $waylandprotocols_root/stable/viewporter/viewporter.xml $path($>[0])
-      $scanner private-code $waylandprotocols_root/stable/viewporter/viewporter.xml $path($>[1])
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/xdg-shell.xml $path($>[0])
+    $scanner private-code  $wayland_protos/xdg-shell.xml $path($>[1])
   }}
-  <{h c}{wayland-xdg-decoration-client-protocol}>: file{waylandprotocols-path} $scanner
+  <h{idle-inhibit-unstable-v1-client-protocol} h{idle-inhibit-unstable-v1-client-protocol-code}>: $scanner
   {{
-      diag wayland-scanner (xdg-decoration)
-      cat $path($<[0]) | set waylandprotocols_root
-      $scanner client-header $waylandprotocols_root/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml $path($>[0])
-      $scanner private-code $waylandprotocols_root/unstable/xdg-decoration/xdg-decoration-unstable-v1.xml $path($>[1])
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/idle-inhibit-unstable-v1.xml $path($>[0])
+    $scanner private-code  $wayland_protos/idle-inhibit-unstable-v1.xml $path($>[1])
   }}
-  <{h c}{wayland-relative-pointer-unstable-v1-client-protocol}>: file{waylandprotocols-path} $scanner
+  <h{pointer-constraints-unstable-v1-client-protocol} h{pointer-constraints-unstable-v1-client-protocol-code}>: $scanner
   {{
-      diag wayland-scanner (relative-pointer)
-      cat $path($<[0]) | set waylandprotocols_root
-      $scanner client-header $waylandprotocols_root/unstable/relative-pointer/relative-pointer-unstable-v1.xml $path($>[0])
-      $scanner private-code $waylandprotocols_root/unstable/relative-pointer/relative-pointer-unstable-v1.xml $path($>[1])
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/pointer-constraints-unstable-v1.xml $path($>[0])
+    $scanner private-code  $wayland_protos/pointer-constraints-unstable-v1.xml $path($>[1])
   }}
-  <{h c}{wayland-pointer-constraints-unstable-v1-client-protocol}>: file{waylandprotocols-path} $scanner
+  <h{relative-pointer-unstable-v1-client-protocol} h{relative-pointer-unstable-v1-client-protocol-code}>: $scanner
   {{
-      diag wayland-scanner (pointer-constraints)
-      cat $path($<[0]) | set waylandprotocols_root
-      $scanner client-header $waylandprotocols_root/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml $path($>[0])
-      $scanner private-code $waylandprotocols_root/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml $path($>[1])
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/relative-pointer-unstable-v1.xml $path($>[0])
+    $scanner private-code  $wayland_protos/relative-pointer-unstable-v1.xml $path($>[1])
   }}
-  <{h c}{wayland-idle-inhibit-unstable-v1-client-protocol}>: file{waylandprotocols-path} $scanner
+  <h{fractional-scale-v1-client-protocol} h{fractional-scale-v1-client-protocol-code}>: $scanner
   {{
-      diag wayland-scanner (idle-inhibit)
-      cat $path($<[0]) | set waylandprotocols_root
-      $scanner client-header $waylandprotocols_root/unstable/idle-inhibit/idle-inhibit-unstable-v1.xml $path($>[0])
-      $scanner private-code $waylandprotocols_root/unstable/idle-inhibit/idle-inhibit-unstable-v1.xml $path($>[1])
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/fractional-scale-v1.xml $path($>[0])
+    $scanner private-code  $wayland_protos/fractional-scale-v1.xml $path($>[1])
+  }}
+  <h{xdg-activation-v1-client-protocol} h{xdg-activation-v1-client-protocol-code}>: $scanner
+  {{
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/xdg-activation-v1.xml $path($>[0])
+    $scanner private-code  $wayland_protos/xdg-activation-v1.xml $path($>[1])
+  }}
+  <h{xdg-decoration-unstable-v1-client-protocol} h{xdg-decoration-unstable-v1-client-protocol-code}>: $scanner
+  {{
+    diag wayland-scanner $>
+    $scanner client-header $wayland_protos/xdg-decoration-unstable-v1.xml $path($>[0])
+    $scanner private-code  $wayland_protos/xdg-decoration-unstable-v1.xml $path($>[1])
   }}
   
 }
-elif ($usex11)
+
+if ($build_x11)
 {
-  c.poptions += -D_GLFW_X11
+  c.poptions += -D_GLFW_X11 -D_DEFAULT_SOURCE
   gl_libs += -lrt -lm -ldl -lX11 -lpthread
 }
-elif ($useosmesa)
-{ 
-  gl_libs += -lrt -lm -ldl -lOSMesa -lpthread
-  c.poptions += -D_GLFW_OSMESA
-}
+
 if ($hybridhpg)
   c.poptions += -D_GLFW_USE_HYBRID_HPG
 
-if ($config.glfw.vulkan)
-  c.poptions += -D_GLFW_VALKAN_STATIC
+# if ($config.glfw.vulkan)
+#   c.poptions += -D_GLFW_VALKAN_STATIC
   
 
 obja{*}: c.poptions += -DGLFW_STATIC_BUILD
