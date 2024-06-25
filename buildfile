@@ -1,3 +1,3 @@
-import pkgs = {glfw*/}
+import pkgs = {glfw/}
 
 ./: $pkgs
