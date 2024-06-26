@@ -19,4 +19,4 @@ The following configuration variables are current supported:
 
 ## Default setup on Linux
 
-Uses both X11 and Wayland by default when building on linux. Set `config.glfw.usewayland = true` to enable Wayland support. This requires `wayland-scanner` to be installed on the system (`wayland-protocols` not required).
+Uses both X11 and Wayland by default when building on linux. This requires `wayland-scanner` to be installed on the system (`wayland-protocols` is not required).
