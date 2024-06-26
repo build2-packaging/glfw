@@ -5,8 +5,8 @@ summary: GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES an
 license: Zlib
 description-file: README.md
 url: https://www.glfw.org
-package-url: https://github.com/Swat-SomeBug/glfw.git
-email: swat.somebug@gmail.com
+package-url: https://github.com/monomere/glfw-build2.git
+email: monomere@duck.com
 # tests: glfw-tests == $
 examples: glfw-examples == $
 depends: * build2 >= 0.16.0
