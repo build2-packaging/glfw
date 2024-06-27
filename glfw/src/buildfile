@@ -82,7 +82,7 @@ if ($cocoa)
   gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundation
 }
 
-wayland_protos = $src_base/../../upstream/deps/wayland
+wayland_protos = $src_base/../deps/wayland
 
 if ($build_wayland)
 {
@@ -91,23 +91,23 @@ if ($build_wayland)
   import! scanner = wayland-scanner%exe{wayland-scanner}
           
   lib{glfw}: h{wayland-client-protocol \
-                   wayland-client-protocol-code \
-                   viewporter-client-protocol \
-                   viewporter-client-protocol-code \
-                   xdg-shell-client-protocol \
-                   xdg-shell-client-protocol-code \
-                   idle-inhibit-unstable-v1-client-protocol \
-                   idle-inhibit-unstable-v1-client-protocol-code \
-                   pointer-constraints-unstable-v1-client-protocol \
-                   pointer-constraints-unstable-v1-client-protocol-code \
-                   relative-pointer-unstable-v1-client-protocol \
-                   relative-pointer-unstable-v1-client-protocol-code \
-                   fractional-scale-v1-client-protocol \
-                   fractional-scale-v1-client-protocol-code \
-                   xdg-activation-v1-client-protocol \
-                   xdg-activation-v1-client-protocol-code \
-                   xdg-decoration-unstable-v1-client-protocol \
-                   xdg-decoration-unstable-v1-client-protocol-code}
+               wayland-client-protocol-code \
+               viewporter-client-protocol \
+               viewporter-client-protocol-code \
+               xdg-shell-client-protocol \
+               xdg-shell-client-protocol-code \
+               idle-inhibit-unstable-v1-client-protocol \
+               idle-inhibit-unstable-v1-client-protocol-code \
+               pointer-constraints-unstable-v1-client-protocol \
+               pointer-constraints-unstable-v1-client-protocol-code \
+               relative-pointer-unstable-v1-client-protocol \
+               relative-pointer-unstable-v1-client-protocol-code \
+               fractional-scale-v1-client-protocol \
+               fractional-scale-v1-client-protocol-code \
+               xdg-activation-v1-client-protocol \
+               xdg-activation-v1-client-protocol-code \
+               xdg-decoration-unstable-v1-client-protocol \
+               xdg-decoration-unstable-v1-client-protocol-code}
   <h{wayland-client-protocol} h{wayland-client-protocol-code}>: $scanner
   {{
     diag wayland-scanner $>
