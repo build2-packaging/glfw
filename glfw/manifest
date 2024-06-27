@@ -8,7 +8,7 @@ url: https://www.glfw.org
 package-url: https://github.com/monomere/glfw-build2.git
 email: monomere@duck.com
 # tests: glfw-tests == $
-examples: glfw-examples == $
+# examples: glfw-examples == $
 depends: * build2 >= 0.16.0
 depends: * bpkg >= 0.16.0
 builds: -freebsd

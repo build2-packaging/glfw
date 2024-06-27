@@ -1,5 +1,11 @@
+# monomere/glfw-build2
+#
 : 1
+min-bpkg-version: 0.17.0
+:
 summary: glfw project repository
+email: monomere@duck.com
+
 
 #:
 #role: prerequisite

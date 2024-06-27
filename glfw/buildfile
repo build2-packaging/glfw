@@ -1,4 +1,4 @@
-./: {*/ -build/ -upstream/} doc{README.md} legal{LICENSE.md} manifest
+./: {src/} doc{README.md} legal{LICENSE.md} manifest
 
 # Don't install tests.
 #
