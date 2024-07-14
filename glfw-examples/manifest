@@ -1,6 +1,6 @@
 : 1
 name: glfw-examples
-version: 3.3.8+1
+version: 3.4.0
 project: glfw
 summary: GLFW examples library
 license: Zlib
@@ -10,5 +10,5 @@ package-url: https://github.com/Swat-SomeBug/glfw.git
 email: swat.somebug@gmail.com
 depends: * build2 >= 0.13.0
 depends: * bpkg >= 0.13.0
-requires: ; OpengGL/Vulkan libraries. Usually installed with system or SDK on Windows.
-requires: ; X11 when building for Linux
+requires: ; OpengGL libraries. Usually installed with system or SDK on Windows.
+requires: ; X11 and Wayland when building for Linux

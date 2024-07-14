@@ -14,8 +14,8 @@ test.target = $c.target
 tcls = $c.target.class
 tsys = $c.target.system
 
-config [bool] config.glfw.build_wayland ?= true
-config [bool] config.glfw.build_x11 ?= true
+config [bool] config.glfw.usewayland ?= true
+config [bool] config.glfw.usex11 ?= true
 config [bool] config.glfw.usehybridhpg ?= false
 
 linux = ($tcls == 'linux')
@@ -23,6 +23,6 @@ unix  = ($tcls == 'freebsd' || $tcls == 'linux')
 win32 = ($tcls == 'windows')
 cocoa = ($tcls == 'macos')
 
-build_wayland = ($unix && $config.glfw.build_wayland)
-build_x11     = ($unix && $config.glfw.build_x11)
+build_wayland = ($unix && $config.glfw.usewayland)
+build_x11     = ($unix && $config.glfw.usex11)
 hybridhpg = ($win32 && $config.glfw.usehybridhpg)
