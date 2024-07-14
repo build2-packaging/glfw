@@ -1,1 +1,0 @@
-../upstream/examples/gears.c

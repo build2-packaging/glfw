@@ -1,1 +1,0 @@
-../../upstream/deps/tinycthread.c

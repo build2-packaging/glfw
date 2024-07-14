@@ -1,20 +1,33 @@
+./: manifest doc{README.md} legal{LICENSE.md}
+
 import libs = glfw%lib{glfw}
 
-libue{tinycthread}: {h c}{deps/tinycthread} h{**}
-libue{getopt}: {h c}{deps/getopt} h{**}
-libue{glad_gl}: c{deps/glad_gl} h{**}
+libue{tinycthread}: {h c}{deps/tinycthread}
+libue{getopt}: {h c}{deps/getopt}
+libue{glad_gl}: h{deps/glad/gl}
+libue{glad_gles2}: h{deps/glad/gles2}
 
-for n: boing gears heightmap offscreen particles \
-        sharing simple splitview wave
+examples = \
+    boing gears heightmap wave offscreen \
+    particles sharing splitview windows \
+    triangle-opengl triangle-opengles
+
+for n: $examples
 {
-    ./: exe{$n}: c{$n} $libs libue{glad_gl}
+    ./: exe{$n}: c{$n} $libs
+
+    # Ok since this isn't config-specific.
+    if! $ends_with($n, opengles)
+        exe{$n}: libue{glad_gl}
 }
 
+exe{triangle-opengles}: libue{glad_gles2}
 exe{particles}: libue{tinycthread} libue{getopt}
 
 c.poptions += "-I$src_root/deps/"
-./: manifest doc{README.md} legal{LICENSE.md}
 exe{*}: install = false
 
 if ($c.target.class == 'windows')
     c.poptions += -D_CRT_SECURE_NO_WARNINGS
+
+# TODO: icons

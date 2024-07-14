@@ -1,1 +1,45 @@
-./: {*/ -build/ -basics/} manifest doc{README.md} legal{LICENSE.md}
+./: manifest doc{README.md} legal{LICENSE.md}
+
+import libs = glfw%lib{glfw}
+
+libue{tinycthread}: {h c}{deps/tinycthread}
+libue{getopt}: {h c}{deps/getopt}
+libue{glad_gl}: h{deps/glad/gl}
+libue{glad_gles2}: h{deps/glad/gles2}
+libue{glad_vulkan}: h{deps/glad/vulkan}
+
+console_tests = \
+    allocator clipboard events msaa glfwinfo \
+    iconify monitors reopen cursor \
+
+graphics_tests = \
+    empty gamma icon inputlag joysticks \
+    tearing threads timeout title triangle-vulkan window \
+
+for n: $console_tests
+    ./: exe{$n}: c{$n} $libs libue{glad_gl}
+
+exe{clipboard events msaa glfwinfo iconify monitors}: libue{getopt}
+exe{glfwinfo}: libue{glad_vulkan}
+
+for n: $graphics_tests
+{
+    ./: exe{$n}: c{$n} $libs
+
+    if! $ends_with($n, vulkan)
+        exe{$n}: libue{glad_gl}
+}
+
+exe{empty threads}: libue{tinycthread}
+exe{triangle-vulkan}: libue{glad_vulkan}
+exe{inputlag}: libue{getopt}
+
+exe{glfwinfo}: testscript{glfwinfo}
+exe{monitors}: testscript{monitors}
+
+c.poptions += "-I$src_root/deps/"
+exe{*}: install = false
+
+if ($c.target.class == 'windows')
+    c.poptions += -D_CRT_SECURE_NO_WARNINGS
+
