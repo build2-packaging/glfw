@@ -17,7 +17,7 @@ for n: $examples
     ./: exe{$n}: c{$n} $libs
 
     # Ok since this isn't config-specific.
-    if! $ends_with($n, opengles)
+    if! $string.ends_with($n, opengles)
         exe{$n}: libue{glad_gl}
 }
 

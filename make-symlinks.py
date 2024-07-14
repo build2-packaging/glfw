@@ -92,11 +92,11 @@ def main():
 		elif os.path.islink(target_name):
 			unlink_file(target_name)
 
-	# for source_name, target_name in dirs.items():
-	# 	if os.path.isdir(source_name):
-	# 		link_dir(source_name, target_name)
-	# 	elif os.path.isfile(source_name):
-	# 		link_file(source_name, target_name)
+	for source_name, target_name in dirs.items():
+		if os.path.isdir(source_name):
+			link_dir(source_name, target_name)
+		elif os.path.isfile(source_name):
+			link_file(source_name, target_name)
 
 
 if __name__ == '__main__': exit(main() or 0)
