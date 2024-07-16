@@ -1,0 +1,1 @@
+../../../upstream/deps/mingw/xinput.h

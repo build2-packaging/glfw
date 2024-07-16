@@ -9,18 +9,18 @@ import shutil, fnmatch, os.path, os
 blacklist = {"CMake*", ".*"} # both files and directories.
 whitelist = {"*.[hmc]", "*.png", "*.md"} # files only.
 
-dirs = {
-	"./upstream/src":          "./glfw/src",
-	"./upstream/include/GLFW": "./glfw/include/GLFW",
-	"./upstream/tests":        "./glfw-tests",
-	"./upstream/examples":     "./glfw-examples",
-	"./upstream/deps":         "./glfw-examples/deps",
-	"./upstream/README.md":    "./glfw-examples/README.md",
-	"./upstream/LICENSE.md":   "./glfw-examples/LICENSE.md",
-	"./upstream/deps":         "./glfw-tests/deps",
-	"./upstream/README.md":    "./glfw-tests/README.md",
-	"./upstream/LICENSE.md":   "./glfw-tests/LICENSE.md",
-}
+dirs = [
+	("./upstream/src",          "./glfw/src"),
+	("./upstream/include/GLFW", "./glfw/include/GLFW"),
+	("./upstream/tests",        "./glfw-tests"),
+	("./upstream/examples",     "./glfw-examples"),
+	("./upstream/deps",         "./glfw-examples/deps"),
+	("./upstream/README.md",    "./glfw-examples/README.md"),
+	("./upstream/LICENSE.md",   "./glfw-examples/LICENSE.md"),
+	("./upstream/deps",         "./glfw-tests/deps"),
+	("./upstream/README.md",    "./glfw-tests/README.md"),
+	("./upstream/LICENSE.md",   "./glfw-tests/LICENSE.md"),
+]
 
 
 def matches_any(name: str, pats: set[str]) -> bool:
@@ -86,13 +86,13 @@ def link_dir(source_dir: str, target_dir: str):
 
 
 def main():
-	for target_name in dirs.values():
+	for _, target_name in dirs:
 		if os.path.isdir(target_name):
 			unlink_dir(target_name)
 		elif os.path.islink(target_name):
 			unlink_file(target_name)
 
-	for source_name, target_name in dirs.items():
+	for source_name, target_name in dirs:
 		if os.path.isdir(source_name):
 			link_dir(source_name, target_name)
 		elif os.path.isfile(source_name):
