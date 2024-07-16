@@ -10,11 +10,11 @@ libue{glad_vulkan}: h{deps/glad/vulkan}
 
 console_tests = \
     allocator clipboard events msaa glfwinfo \
-    iconify monitors reopen cursor \
+    iconify monitors reopen cursor
 
 graphics_tests = \
     empty gamma icon inputlag joysticks \
-    tearing threads timeout title triangle-vulkan window \
+    tearing threads timeout title triangle-vulkan window
 
 for n: $console_tests
     ./: exe{$n}: c{$n} $libs libue{glad_gl}
@@ -26,8 +26,8 @@ for n: $graphics_tests
 {
     ./: exe{$n}: c{$n} $libs
 
-    if! $string.ends_with($n, vulkan)
-        exe{$n}: libue{glad_gl}
+    # if! 
+    exe{$n}: libue{glad_gl}: include = ($n != triangle-vulkan)
 }
 
 exe{empty threads}: libue{tinycthread}
@@ -39,6 +39,8 @@ exe{monitors}: testscript{monitors}
 
 c.poptions += "-I$src_root/deps/"
 exe{*}: install = false
+
+c.loptions += "-lm"
 
 if ($c.target.class == 'windows')
     c.poptions += -D_CRT_SECURE_NO_WARNINGS
