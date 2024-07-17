@@ -5,12 +5,12 @@ summary: GLFW is an Open Source, multi-platform library for OpenGL, OpenGL ES an
 license: Zlib
 description-file: README.md
 url: https://www.glfw.org
-package-url: https://github.com/monomere/glfw-build2.git
-email: monomere@duck.com
-# tests: glfw-tests == $
-# examples: glfw-examples == $
-depends: * build2 >= 0.16.0
-depends: * bpkg >= 0.16.0
+package-url: https://github.com/build2-packaging/glfw.git
+email: packaging@build2.org ; Mailing list.
+tests: glfw-tests == $
+examples: glfw-examples == $
+depends: * build2 >= 0.17.0
+depends: * bpkg >= 0.17.0
 builds: -freebsd
 build-exclude: macos*-gcc** ; GCC not supported on macos -> Cannot parse Cocoa
 requires: ; OpengGL/Vulkan libraries. Usually installed with system or SDK on Windows.

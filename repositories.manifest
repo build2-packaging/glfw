@@ -1,17 +1,2 @@
-# monomere/glfw-build2
-#
 : 1
-min-bpkg-version: 0.17.0
-:
 summary: glfw project repository
-email: monomere@duck.com
-
-
-#:
-#role: prerequisite
-#location: https://pkg.cppget.org/1/stable
-#trust: ...
-
-#:
-#role: prerequisite
-#location: https://git.build2.org/hello/libhello.git

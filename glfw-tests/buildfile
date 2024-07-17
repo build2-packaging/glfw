@@ -40,7 +40,7 @@ exe{monitors}: testscript{monitors}
 c.poptions += "-I$src_root/deps/"
 exe{*}: install = false
 
-c.loptions += "-lm"
+c.libs += -lm
 
 if ($c.target.class == 'windows')
     c.poptions += -D_CRT_SECURE_NO_WARNINGS
