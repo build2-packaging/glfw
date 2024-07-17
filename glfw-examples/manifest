@@ -7,8 +7,8 @@ license: Zlib
 description-file: README.md
 url: https://www.glfw.org
 package-url: https://github.com/Swat-SomeBug/glfw.git
-email: swat.somebug@gmail.com
-depends: * build2 >= 0.13.0
-depends: * bpkg >= 0.13.0
+email: packaging@build2.org ; Mailing list.
+depends: * build2 >= 0.17.0
+depends: * bpkg >= 0.17.0
 requires: ; OpengGL libraries. Usually installed with system or SDK on Windows.
 requires: ; X11 and Wayland when building for Linux

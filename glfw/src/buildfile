@@ -82,10 +82,9 @@ if ($cocoa)
   gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundation
 }
 
-wayland_protos = $src_base/../deps/wayland
-
 if ($build_wayland)
 {
+  wayland_protos = $src_base/../deps/wayland
   c.poptions += -D_GLFW_WAYLAND -D_DEFAULT_SOURCE
   gl_libs += -lrt -lm -ldl -lwayland-client -lwayland-cursor -lwayland-egl -lpthread
   import! scanner = wayland-scanner%exe{wayland-scanner}

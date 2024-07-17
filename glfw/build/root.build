@@ -18,11 +18,11 @@ config [bool] config.glfw.usewayland ?= true
 config [bool] config.glfw.usex11 ?= true
 config [bool] config.glfw.usehybridhpg ?= false
 
-linux = ($tcls == 'linux')
-unix  = ($tcls == 'freebsd' || $tcls == 'linux')
 win32 = ($tcls == 'windows')
 cocoa = ($tcls == 'macos')
+linux = ($tcls == 'linux')
+unix = ($tcls == 'freebsd' || $tcls == 'linux')
 
 build_wayland = ($unix && $config.glfw.usewayland)
-build_x11     = ($unix && $config.glfw.usex11)
+build_x11 = ($unix && $config.glfw.usex11)
 hybridhpg = ($win32 && $config.glfw.usehybridhpg)
