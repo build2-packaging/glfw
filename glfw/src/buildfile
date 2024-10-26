@@ -73,7 +73,7 @@ if ($cocoa)
   switch $c.id: path.match
   {
     case "*clang*"
-      c.coptions += -objC
+      c.coptions +=
     default
       fail "Only clang supported on MacOS"
   
