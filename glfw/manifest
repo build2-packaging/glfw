@@ -14,5 +14,5 @@ depends: * bpkg >= 0.17.0
 builds: -freebsd
 build-exclude: macos*-gcc** ; GCC not supported on macos -> Cannot parse Cocoa
 requires: ; OpengGL/Vulkan libraries. Usually installed with system or SDK on Windows.
-requires: ; Any (or some) of X11, Wayland and libOSMesa when building for Linux
-requires: ; Wayland build requires pkg-config and wayland libraries and utilites
+requires: ; X11 and/or Wayland when building for Linux
+requires: ; Wayland build requires pkg-config and wayland libraries and utilites (libwayland-dev on debian/ubuntu)

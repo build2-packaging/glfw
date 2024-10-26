@@ -11,8 +11,8 @@ on:
 
 jobs:
 
-  # Job for building on Ubuntu
-  Ubuntu:
+  # Job for building on Ubuntu with only X11 support enabled.
+  Ubuntu-X11:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
     strategy:
@@ -40,11 +40,16 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev
       - name: Configure
-        run: bdep init -C ../glfw-build @glfwcfg cc config.config.load=build-config/${{matrix.config.config_file}}
+        run: 
+            bdep init --empty
+            bdep config create @glfwcfg ../glfw-build cc config.config.load=build-config/${{matrix.config.config_file}}
+            bdep init @glfwcfg config.glfw.usewayland=false config.glfw.usex11=true
       - name: Build
         run: b -V
+      - name: Test
+        run: b -V test
 
-  # Job for building on Ubuntu-Wayland
+  # Job for building on Ubuntu with both Wayland and X11 support enabled.
   Ubuntu-Wayland:
     name: ${{matrix.config.name}}
     runs-on: ${{matrix.config.os}}
@@ -65,76 +70,16 @@ jobs:
         with:
           build2-version: staged
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev libwayland-dev wayland-protocols libxkbcommon-dev
+        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev libwayland-dev libxkbcommon-dev
       - name: Configure
         run: |
             bdep init --empty
             bdep config create @glfwcfg ../glfw-build cc config.config.load=build-config/${{matrix.config.config_file}}
-            bdep init @glfwcfg config.glfw.usewayland=true
-      - name: Build
-        run: b -V
-
-  # Job for building on Ubuntu-OSMesa
-  Ubuntu-OSMesa:
-    name: ${{matrix.config.name}}
-    runs-on: ${{matrix.config.os}}
-    strategy:
-      matrix:
-        config:
-          - name: Ubuntu gcc OSMesa Debug
-            os: ubuntu-latest
-            config_file: gcc.debug.build
-          - name: Ubuntu gcc OSMesa Release
-            os: ubuntu-latest
-            config_file: gcc.release.build
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-      - uses: build2/setup-build2-github-action@v2
-        with:
-          build2-version: staged
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev libosmesa6-dev
-      - name: Configure
-        run: |
-            bdep init --empty
-            bdep config create @glfwcfg ../glfw-build cc config.config.load=build-config/${{matrix.config.config_file}}
-            bdep init @glfwcfg config.glfw.useosmesa=true
+            bdep init @glfwcfg config.glfw.usewayland=true config.glfw.usex11=true
       - name: Build
         run: b -V
       - name: Test
         run: b -V test
-
-  # Job for building on Ubuntu-Vulkan
-  Ubuntu-Vulkan:
-    name: ${{matrix.config.name}}
-    runs-on: ${{matrix.config.os}}
-    strategy:
-      matrix:
-        config:
-          - name: Ubuntu gcc Vulkan Debug
-            os: ubuntu-latest
-            config_file: gcc.debug.build
-          - name: Ubuntu gcc Vulkan Release
-            os: ubuntu-latest
-            config_file: gcc.release.build
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-      - uses: build2/setup-build2-github-action@v2
-        with:
-          build2-version: staged
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxrandr-dev libudev-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev xorg-dev libvulkan-dev
-      - name: Configure
-        run: |
-            bdep init --empty
-            bdep config create @glfwcfg ../glfw-build cc config.config.load=build-config/${{matrix.config.config_file}}
-            bdep init @glfwcfg config.glfw.vulkan=true
-      - name: Build
-        run: b -V
 
   # Job for building on MacOS
   MacOS:
