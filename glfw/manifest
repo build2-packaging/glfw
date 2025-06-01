@@ -48,6 +48,10 @@ fedora-wayland-build-include: linux_fedora*-**
 fedora-wayland-build-exclude: **
 fedora-wayland-build-config: config.glfw.build_wayland=true config.glfw.build_x11=true
 
+# Note: System package names are case-sensitive. For example, `libxkbcommon` is
+# correctly lowercase, whereas `libXcursor`, `libXi`, etc., use an uppercase 'X'
+# as per their upstream and packaging conventions. These are not typos.
+#
 fedora-x11-builds: sys
 fedora-x11-build-include: linux_fedora*-**
 fedora-x11-build-exclude: **
