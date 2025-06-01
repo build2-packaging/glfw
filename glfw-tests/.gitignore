@@ -1,4 +1,7 @@
 # Drivers
+allocator
+window
+
 # Console
 clipboard
 cursor
