@@ -8,6 +8,9 @@ sharing
 simple
 splitview
 wave
+triangle-opengl
+triangle-opengles
+windows
 
 # Output files
 offscreen.png
