@@ -239,7 +239,7 @@ for f: $protocols
 
   h{$f $f-code}:
   {
-     dist = ($develop ? $relative([dir_path] "$p/$d", $d) : false)
+     dist = (($develop && $build_wayland) ? $relative([dir_path] "$p/$d", $d) : false)
   }
 }
 
