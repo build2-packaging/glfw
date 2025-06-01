@@ -55,9 +55,9 @@ fedora-x11-build-config:
 \
 config.glfw.build_x11=true
 
-sys:libXcursor-devel
-sys:libXi-devel
-sys:libXinerama-devel
-sys:libXrandr-devel
-sys:libxkbcommon-devel
+sys:libXcursor
+sys:libXi
+sys:libXinerama
+sys:libXrandr
+sys:libxkbcommon
 \
