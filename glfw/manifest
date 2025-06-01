@@ -18,6 +18,7 @@ requires: ; Wayland build requires pkg-config and wayland libraries and utilites
 builds: -linux
 builds: -freebsd ; supported but the required libraries are not installed by default
 builds: -macos
+builds: -bindist
 
 macos-builds: macos
 macos-build-include: macos_*-clang ; only clang compiler is supported on macOS
