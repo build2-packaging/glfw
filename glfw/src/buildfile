@@ -149,7 +149,7 @@ if ($macos)
 {
   # macOS requires Clang compiler, so we check for it.
   #
-  if ($c.id: path.match != "*clang*")
+  if ($c.id != "*clang*")
   {
     fail "Unsupported compiler toolchain detected. macOS builds require Clang compiler. \
           Please configure your build environment to use Clang or switch to a supported platform."
