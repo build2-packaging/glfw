@@ -1,28 +1,47 @@
+using in
+
+# Uncomment to suppress warnings coming from external libraries.
+#
+# c.internal.scope = current
+
 c.std = 99
 
 using c
 using c.objc
-using in
 
-c{*}: extension = c
 h{*}: extension = h
+c{*}: extension = c
 
 # The test target for cross-testing (running tests under Wine, etc).
 #
 test.target = $c.target
 
-tcls = $c.target.class
-tsys = $c.target.system
+# Pre-defined semantics to distinguish between development and consumption
+# builds.
+#
+config [bool] config.glfw.develop ?= false
+develop = $config.glfw.develop # shorthand
 
-config [bool] config.glfw.usewayland ?= true
-config [bool] config.glfw.usex11 ?= true
-config [bool] config.glfw.usehybridhpg ?= false
+# Platform shorthand
+#
+windows = ($c.target.class == 'windows')
+macos = ($c.target.class == 'macos')
+linux = ($c.target.class == 'linux')
+freebsd = ($c.target.class == 'freebsd')
 
-win32 = ($tcls == 'windows')
-cocoa = ($tcls == 'macos')
-linux = ($tcls == 'linux')
-unix = ($tcls == 'freebsd' || $tcls == 'linux')
+# Upstream options.
+#
+# Note that we deliberately exclude build_win32 and build_cocoa because those
+# options are already implicitly handled by the platform shorthands above.
+#
+config [bool, config.report] config.glfw.build_x11 ?= ($linux || $freebsd)
+config [bool, config.report] config.glfw.build_wayland ?= ($linux || $freebsd)
+config [bool, config.report] config.glfw.use_hybrid_hpg ?= false
+config [bool, config.report] config.glfw.use_msvc_runtime_library_dll ?= false
 
-build_wayland = ($unix && $config.glfw.usewayland)
-build_x11 = ($unix && $config.glfw.usex11)
-hybridhpg = ($win32 && $config.glfw.usehybridhpg)
+# Upstream options shorthand.
+#
+build_x11 = $config.glfw.build_x11
+build_wayland = $config.glfw.build_wayland
+use_hybrid_hpg = $config.glfw.use_hybrid_hpg
+use_msvc_runtime_library_dll = $config.glfw.use_msvc_runtime_library_dll
