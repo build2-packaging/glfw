@@ -16,14 +16,18 @@ requires: ; X11 and/or Wayland when building for Linux
 requires: ; Wayland build requires pkg-config and wayland libraries and utilites (libwayland-dev on debian/ubuntu)
 
 builds: -linux
-builds: -freebsd
-builds: -( +macos &clang ) ; macOS builds are only supported with clang.
+builds: -freebsd ; supported but the required libraries are not installed by default
+builds: -macos
 
-freebsd-wayland-builds: freebsd
-freebsd-wayland-build-config: config.glfw.build_wayland=true config.glfw.build_x11=true
+macos-builds: macos
+macos-build-include: macos_*-clang ; only clang compiler is supported on macOS
+macos-build-exclude: **
 
-freebsd-x11-builds: freebsd
-freebsd-x11-build-config: config.glfw.build_x11=true
+# freebsd-wayland-builds: freebsd
+# freebsd-wayland-build-config: config.glfw.build_wayland=true config.glfw.build_x11=true
+#
+# freebsd-x11-builds: freebsd
+# freebsd-x11-build-config: config.glfw.build_x11=true
 
 debian-wayland-builds: sys
 debian-wayland-build-include: linux_debian_12-** ; Wayland client libraries are only available from debian 12 and later.

@@ -52,16 +52,19 @@ lib{glfw}: m{cocoa_joystick \
 
 # Windows (Win32 + WGL)
 #
-lib{glfw}: c{win32_joystick \
-             win32_monitor  \
-             win32_window   \
+lib{glfw}: c{wgl_context    \
              win32_init     \
+             win32_joystick \
              win32_module   \
-             wgl_context}   \
-           h{win32_joystick \
-             win32_platform \
+             win32_monitor  \
+             win32_thread   \
              win32_time     \
-             win32_thread}: include = $windows
+             win32_window}  \
+           h{win32_joystick \
+             win32_module   \
+             win32_platform \
+             win32_thread   \
+             win32_time}:   include = $windows
 
 # Unix (generic POSIX components)
 #
