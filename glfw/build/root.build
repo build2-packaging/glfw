@@ -34,8 +34,8 @@ freebsd = ($c.target.class == 'freebsd')
 # Note that we deliberately exclude build_win32 and build_cocoa because those
 # options are already implicitly handled by the platform shorthands above.
 #
-config [bool, config.report] config.glfw.build_x11 ?= ($linux || $freebsd)
-config [bool, config.report] config.glfw.build_wayland ?= ($linux || $freebsd)
+config [bool, config.report] config.glfw.build_x11 ?= false
+config [bool, config.report] config.glfw.build_wayland ?= false
 config [bool, config.report] config.glfw.use_hybrid_hpg ?= false
 config [bool, config.report] config.glfw.use_msvc_runtime_library_dll ?= false
 
