@@ -31,6 +31,10 @@ macos-build-exclude: **
 
 debian-wayland-builds: sys
 debian-wayland-build-include: linux_debian_12-** ; Wayland client libraries are only available from debian 12 and later.
+debian-wayland-build-exclude: linux_debian_12-clang_18-static_O3 ; static variant not available
+debian-wayland-build-exclude: linux_debian_12-gcc_14-static_O3  ; static variant not available
+debian-wayland-build-exclude: linux_debian_12-clang_18_libc++-static_O3  ; static variant not available
+
 debian-wayland-build-exclude: **
 debian-wayland-build-config: config.glfw.build_wayland=true config.glfw.build_x11=true
 
@@ -47,4 +51,13 @@ fedora-wayland-build-config: config.glfw.build_wayland=true config.glfw.build_x1
 fedora-x11-builds: sys
 fedora-x11-build-include: linux_fedora*-**
 fedora-x11-build-exclude: **
-fedora-x11-build-config: config.glfw.build_x11=true
+fedora-x11-build-config:
+\
+config.glfw.build_x11=true
+
+sys:libXcursor-devel
+sys:libXi-devel
+sys:libXinerama-devel
+sys:libXrandr-devel
+sys:libxkbcommon-devel
+\
