@@ -48,7 +48,7 @@ lib{glfw}: m{cocoa_joystick \
            h{cocoa_platform \
              cocoa_joystick \
              cocoa_time     \
-             posix_thread}: include = $cocoa
+             posix_thread}: include = $macos
 
 # Windows (Win32 + WGL)
 #
@@ -61,7 +61,7 @@ lib{glfw}: c{win32_joystick \
            h{win32_joystick \
              win32_platform \
              win32_time     \
-             win32_thread}: include = $win32
+             win32_thread}: include = $windows
 
 # Unix (generic POSIX components)
 #
@@ -73,7 +73,7 @@ lib{glfw}: c{posix_time    \
            h{posix_time    \
              posix_thread  \
              posix_poll    \
-             xkb_unicode}: include = $unix
+             xkb_unicode}: include = ($linux || $freebsd)
 
 # Unix - X11 backend
 #
@@ -81,14 +81,14 @@ lib{glfw}: c{x11_init       \
              x11_monitor    \
              x11_window     \
              glx_context}   \
-           h{x11_platform}: include = $unix
+           h{x11_platform}: include = ($linux || $freebsd)
 
 # Unix - Wayland backend
 #
 lib{glfw}: c{wl_init       \
              wl_monitor    \
              wl_window}    \
-           h{wl_platform}: include = $unix
+           h{wl_platform}: include = ($linux || $freebsd)
 
 # Linux-specific joystick support
 #
@@ -113,12 +113,12 @@ gl_libs =
 
 # Windows-specific configuration
 #
-if ($win32)
+if ($windows)
 {
   c.poptions += -D_GLFW_WIN32 \
                 -D_CRT_SECURE_NO_WARNINGS
 
-  switch $tsys: path.match
+  switch $c.target.system: path.match
   {
     case '*msvc*'
       gl_libs += gdi32.lib
@@ -130,7 +130,7 @@ if ($win32)
 
 # macOS-specific configuration for Clang
 #
-if ($cocoa)
+if ($macos)
 {
   # macOS requires Clang compiler, so we check for it.
   #
@@ -166,13 +166,34 @@ if ($build_wayland)
   # NOTE: libwayland should eventually be packaged as a build2 package. For now,
   #       we assume it is installed in the system or user environment.
   #
-  gl_libs += -lrt             \
-             -lm              \
-             -ldl             \
-             -lwayland-client \
+  gl_libs += -lwayland-client \
              -lwayland-cursor \
              -lwayland-egl    \
+             -lrt             \
+             -lm              \
+             -ldl             \
              -lpthread
+
+  # Preserve Wayland protocol files in the distribution.
+  #
+  # NOTE: Attempts to express this more cleanly result in either:
+  #
+  #   error: multiple names on the left hand side of a pair
+  # or
+  #   error: out-qualified target pattern.
+  #
+  # The current approach is admittedly inelegant, but it works and it's
+  # reliable.
+  #
+  file{../deps/wayland/wayland.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/viewporter.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/xdg-shell.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/idle-inhibit-unstable-v1.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/pointer-constraints-unstable-v1.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/relative-pointer-unstable-v1.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/fractional-scale-v1.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/xdg-activation-v1.xml}@../deps/wayland/: dist = true
+  file{../deps/wayland/xdg-decoration-unstable-v1.xml}@../deps/wayland/: dist = true
 }
 
 # Import the scanner executable used to generate protocol headers.
@@ -317,7 +338,7 @@ if ($build_x11)
 
 # Enable hybrid GPU support when requested
 #
-if ($hybridhpg)
+if ($use_hybrid_hpg)
   c.poptions += -D_GLFW_USE_HYBRID_HPG
 
 # Default to static build or shared (DLL) build based on target type
@@ -348,7 +369,7 @@ if $version.pre_release
 else
 {
   release_version_suffix = "$version.major.$version.minor"
-  if($tcls == 'windows')
+  if($windows)
     release_version_suffix = "$version.major"
   lib{glfw}: bin.lib.version = @"-$release_version_suffix"
 }
