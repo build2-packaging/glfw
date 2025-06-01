@@ -1,184 +1,334 @@
-# Public headers.
+# Public interface headers.
 #
-
 pub = [dir_path] ../include/GLFW/
 
 include $pub
 
 pub_hdrs = $pub/{$($pub/ pub_hdrs)}
 
-# Common sources and headers.
+# Platform-independent internal headers and source files.
 #
+cmn_hdrs = h{internal       \
+             platform       \
+             mappings       \
+             null_platform  \
+             null_joystick}
 
-cmn_hdrs = h{internal platform mappings null_platform null_joystick}
-cmn_srcs = c{context init input monitor platform vulkan window egl_context osmesa_context null_init null_monitor null_window null_joystick}
+cmn_srcs = c{context        \
+             init           \
+             input          \
+             monitor        \
+             platform       \
+             vulkan         \
+             window         \
+             egl_context    \
+             osmesa_context \
+             null_init      \
+             null_monitor   \
+             null_window    \
+             null_joystick}
 
-
+# Common GLFW library target.
+#
 lib{glfw}: $cmn_hdrs $pub_hdrs $cmn_srcs
 
-
-# MacOS
-lib{glfw}: m{cocoa_joystick cocoa_monitor cocoa_init cocoa_window nsgl_context} \
-           c{posix_thread posix_module cocoa_time} \
-           h{cocoa_platform cocoa_joystick cocoa_time posix_thread}: include = $cocoa
-
-
-# Windows
-lib{glfw}: c{win32_joystick win32_monitor win32_window win32_init win32_module wgl_context} \
-           h{win32_joystick win32_platform win32_time win32_thread}: include = $win32
-
-
-# Unix
-lib{glfw}: c{posix_time posix_thread posix_module} h{posix_time posix_thread}: include = $unix
-
-# Unix - X11
-lib{glfw}: c{x11_init x11_monitor x11_window glx_context} h{x11_platform}: include = $build_x11
-
-# Unix - Wayland
-lib{glfw}: c{wl_init wl_monitor wl_window} h{wl_platform}: include = $build_wayland
-
-# Unix - X11 and Wayland
-lib{glfw}: {h c}{posix_poll xkb_unicode}: include = ($build_wayland || $build_x11)
-
-# Unix - X11 and Wayland - Linux
-lib{glfw}: {h c}{linux_joystick}: include = ($linux && ($build_wayland || $build_x11))
-
-# Build options.
+# Platform-specific implementation components.
 #
+
+# macOS (Cocoa + NSGL)
+#
+lib{glfw}: m{cocoa_joystick \
+             cocoa_monitor  \
+             cocoa_init     \
+             cocoa_window   \
+             nsgl_context}  \
+           c{posix_thread   \
+             posix_module   \
+             cocoa_time}    \
+           h{cocoa_platform \
+             cocoa_joystick \
+             cocoa_time     \
+             posix_thread}: include = $cocoa
+
+# Windows (Win32 + WGL)
+#
+lib{glfw}: c{win32_joystick \
+             win32_monitor  \
+             win32_window   \
+             win32_init     \
+             win32_module   \
+             wgl_context}   \
+           h{win32_joystick \
+             win32_platform \
+             win32_time     \
+             win32_thread}: include = $win32
+
+# Unix (generic POSIX components)
+#
+lib{glfw}: c{posix_time    \
+             posix_thread  \
+             posix_module  \
+             posix_poll    \
+             xkb_unicode}  \
+           h{posix_time    \
+             posix_thread  \
+             posix_poll    \
+             xkb_unicode}: include = $unix
+
+# Unix - X11 backend
+#
+lib{glfw}: c{x11_init       \
+             x11_monitor    \
+             x11_window     \
+             glx_context}   \
+           h{x11_platform}: include = $unix
+
+# Unix - Wayland backend
+#
+lib{glfw}: c{wl_init       \
+             wl_monitor    \
+             wl_window}    \
+           h{wl_platform}: include = $unix
+
+# Linux-specific joystick support
+#
+lib{glfw}: {h c}{linux_joystick}: include = $linux
+
+# Preprocessor include directories for both headers and sources.
+#
+
 out_pfx_inc = [dir_path] $out_root/include/
 src_pfx_inc = [dir_path] $src_root/include/
 out_pfx_src = [dir_path] $out_root/src/
 src_pfx_src = [dir_path] $src_root/src/
 
-c.poptions =+ "-I$out_pfx_src" "-I$src_pfx_src" "-I$out_pfx_inc" "-I$src_pfx_inc"
+c.poptions =+ "-I$out_pfx_src" \
+              "-I$src_pfx_src" \
+              "-I$out_pfx_inc" \
+              "-I$src_pfx_inc"
 
-# Libs
+# Backend-specific configuration and library linkage.
+#
 gl_libs =
 
-# Internal backend selection
+# Windows-specific configuration
+#
 if ($win32)
 {
-  c.poptions += -D_GLFW_WIN32 -D_CRT_SECURE_NO_WARNINGS
+  c.poptions += -D_GLFW_WIN32 \
+                -D_CRT_SECURE_NO_WARNINGS
+
   switch $tsys: path.match
   {
     case '*msvc*'
       gl_libs += gdi32.lib
+
     default
       gl_libs += -lgdi32
   }
 }
 
+# macOS-specific configuration for Clang
+#
 if ($cocoa)
 {
-  switch $c.id: path.match
+  # macOS requires Clang compiler, so we check for it.
+  #
+  if ($c.id: path.match != "*clang*")
   {
-    case "*clang*"
-      c.coptions +=
-    default
-      fail "Only clang supported on MacOS"
-
+    fail "Unsupported compiler toolchain detected. macOS builds require Clang compiler. \
+          Please configure your build environment to use Clang or switch to a supported platform."
   }
+
+  # Add Cocoa-specific compiler options.
+  #
   c.poptions += -D_GLFW_COCOA
-  gl_libs += -framework Cocoa -framework IOKit -framework CoreFoundation
+
+  # Required system libraries for macOS.
+  #
+  gl_libs += -framework Cocoa          \
+             -framework IOKit          \
+             -framework CoreFoundation
 }
 
-lib{glfw}: h{wayland-client-protocol \
-             wayland-client-protocol-code \
-             viewporter-client-protocol \
-             viewporter-client-protocol-code \
-             xdg-shell-client-protocol \
-             xdg-shell-client-protocol-code \
-             idle-inhibit-unstable-v1-client-protocol \
-             idle-inhibit-unstable-v1-client-protocol-code \
-             pointer-constraints-unstable-v1-client-protocol \
-             pointer-constraints-unstable-v1-client-protocol-code \
-             relative-pointer-unstable-v1-client-protocol \
-             relative-pointer-unstable-v1-client-protocol-code \
-             fractional-scale-v1-client-protocol \
-             fractional-scale-v1-client-protocol-code \
-             xdg-activation-v1-client-protocol \
-             xdg-activation-v1-client-protocol-code \
-             xdg-decoration-unstable-v1-client-protocol \
-             xdg-decoration-unstable-v1-client-protocol-code}: include = $build_wayland
+if ($build_wayland)
+{
+  # Path to upstream Wayland protocol definitions.
+  #
+  wayland_protos = $src_base/../deps/wayland
 
-wayland_protos = $src_base/../deps/wayland
-c.poptions += -D_GLFW_WAYLAND -D_DEFAULT_SOURCE
-gl_libs += -lrt -lm -ldl -lwayland-client -lwayland-cursor -lwayland-egl -lpthread
+  # Wayland support and baseline feature macros.
+  #
+  c.poptions += -D_GLFW_WAYLAND -D_DEFAULT_SOURCE
+
+  # Required system and user-space client libraries for Wayland.
+  #
+  # NOTE: libwayland should eventually be packaged as a build2 package. For now,
+  #       we assume it is installed in the system or user environment.
+  #
+  gl_libs += -lrt             \
+             -lm              \
+             -ldl             \
+             -lwayland-client \
+             -lwayland-cursor \
+             -lwayland-egl    \
+             -lpthread
+}
+
+# Import the scanner executable used to generate protocol headers.
+#
 import? scanner = wayland-scanner%exe{wayland-scanner}
+
+# Register all generated headers as part of the GLFW library interface.
+#
+lib{glfw}: h{wayland-client-protocol                                            \
+             wayland-client-protocol-code}                                      \
+                                                                                \
+            h{viewporter-client-protocol                                        \
+              viewporter-client-protocol-code}                                  \
+                                                                                \
+            h{xdg-shell-client-protocol                                         \
+              xdg-shell-client-protocol-code}                                   \
+                                                                                \
+            h{idle-inhibit-unstable-v1-client-protocol                          \
+              idle-inhibit-unstable-v1-client-protocol-code}                    \
+                                                                                \
+            h{pointer-constraints-unstable-v1-client-protocol                   \
+              pointer-constraints-unstable-v1-client-protocol-code}             \
+                                                                                \
+            h{relative-pointer-unstable-v1-client-protocol                      \
+              relative-pointer-unstable-v1-client-protocol-code}                \
+                                                                                \
+            h{fractional-scale-v1-client-protocol                               \
+              fractional-scale-v1-client-protocol-code}                         \
+                                                                                \
+            h{xdg-activation-v1-client-protocol                                 \
+              xdg-activation-v1-client-protocol-code}                           \
+                                                                                \
+            h{xdg-decoration-unstable-v1-client-protocol                        \
+              xdg-decoration-unstable-v1-client-protocol-code}:                 \
+                                                                                \
+  include = $build_wayland
+
+# Wayland core protocol: base surface and input protocol.
+#
 <h{wayland-client-protocol} h{wayland-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/wayland.xml $path($>[0])
   $scanner private-code  $wayland_protos/wayland.xml $path($>[1])
 }}
+
+# Wayland viewport protocol: surface scaling and cropping.
+#
 <h{viewporter-client-protocol} h{viewporter-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/viewporter.xml $path($>[0])
   $scanner private-code  $wayland_protos/viewporter.xml $path($>[1])
 }}
+
+# XDG shell protocol: toplevel and popup window support.
+#
 <h{xdg-shell-client-protocol} h{xdg-shell-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/xdg-shell.xml $path($>[0])
   $scanner private-code  $wayland_protos/xdg-shell.xml $path($>[1])
 }}
+
+# Idle inhibit protocol: screen idle prevention for active surfaces.
+#
 <h{idle-inhibit-unstable-v1-client-protocol} h{idle-inhibit-unstable-v1-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/idle-inhibit-unstable-v1.xml $path($>[0])
   $scanner private-code  $wayland_protos/idle-inhibit-unstable-v1.xml $path($>[1])
 }}
+
+# Pointer constraints protocol: pointer lock and confinement.
+#
 <h{pointer-constraints-unstable-v1-client-protocol} h{pointer-constraints-unstable-v1-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/pointer-constraints-unstable-v1.xml $path($>[0])
   $scanner private-code  $wayland_protos/pointer-constraints-unstable-v1.xml $path($>[1])
 }}
+
+# Relative pointer protocol: input deltas from raw devices.
+#
 <h{relative-pointer-unstable-v1-client-protocol} h{relative-pointer-unstable-v1-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/relative-pointer-unstable-v1.xml $path($>[0])
   $scanner private-code  $wayland_protos/relative-pointer-unstable-v1.xml $path($>[1])
 }}
+
+# Fractional scale protocol: non-integer surface scaling factor support.
+#
 <h{fractional-scale-v1-client-protocol} h{fractional-scale-v1-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/fractional-scale-v1.xml $path($>[0])
   $scanner private-code  $wayland_protos/fractional-scale-v1.xml $path($>[1])
 }}
+
+# XDG activation protocol: surface focus and activation triggers.
+#
 <h{xdg-activation-v1-client-protocol} h{xdg-activation-v1-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/xdg-activation-v1.xml $path($>[0])
   $scanner private-code  $wayland_protos/xdg-activation-v1.xml $path($>[1])
 }}
+
+# XDG decoration protocol: client-side and server-side decoration control.
+#
 <h{xdg-decoration-unstable-v1-client-protocol} h{xdg-decoration-unstable-v1-client-protocol-code}>: $scanner
 {{
   diag wayland-scanner $>
+
   $scanner client-header $wayland_protos/xdg-decoration-unstable-v1.xml $path($>[0])
   $scanner private-code  $wayland_protos/xdg-decoration-unstable-v1.xml $path($>[1])
 }}
 
+# X11-specific configuration
+#
 if ($build_x11)
 {
   c.poptions += -D_GLFW_X11 -D_DEFAULT_SOURCE
-  gl_libs += -lrt -lm -ldl -lX11 -lpthread
+
+  # Required system libraries for X11 backend.
+  #
+  gl_libs += -lrt  \
+             -lm   \
+             -ldl  \
+             -lX11 \
+             -lpthread
 }
 
+# Enable hybrid GPU support when requested
+#
 if ($hybridhpg)
   c.poptions += -D_GLFW_USE_HYBRID_HPG
 
-# if ($config.glfw.vulkan)
-#   c.poptions += -D_GLFW_VALKAN_STATIC
-
-
+# Default to static build or shared (DLL) build based on target type
+#
 obja{*}: c.poptions += -DGLFW_STATIC_BUILD
 objs{*}: c.poptions += -D_GLFW_BUILD_DLL
 
-# Export options
+# Export configuration
 #
 c.libs += $gl_libs
+
 lib{glfw}:
 {
   c.export.poptions = "-I$out_pfx_inc" "-I$src_pfx_inc"
