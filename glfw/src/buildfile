@@ -121,22 +121,7 @@ if ($windows)
   switch $c.target.system: path.match
   {
     case '*msvc*'
-    {
       gl_libs += gdi32.lib
-
-      # Configure MSVC runtime library linkage.
-      #
-      if ($use_msvc_runtime_library_dll)
-      {
-        c.coptions += /MD
-        c.loptions += /MD
-      }
-      else
-      {
-        c.coptions += /MT
-        c.loptions += /MT
-      }
-    }
 
     default
       gl_libs += -lgdi32
