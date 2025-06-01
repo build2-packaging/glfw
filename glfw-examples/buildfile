@@ -7,6 +7,20 @@ libue{getopt}: {h c}{deps/getopt}
 libue{glad_gl}: h{deps/glad/gl}
 libue{glad_gles2}: h{deps/glad/gles2}
 
+# Additional dependency headers that need to be distributed
+#
+./: h{deps/linmath               \
+       deps/nuklear              \
+       deps/nuklear_glfw_gl2     \
+       deps/stb_image_write}
+./: h{deps/mingw/_mingw_dxhelper \
+       deps/mingw/dinput         \
+       deps/mingw/xinput}
+
+# Distribute all dependency files
+#
+{h c}{deps/**}: dist = true
+
 examples = \
     boing gears heightmap wave offscreen \
     particles sharing splitview windows \

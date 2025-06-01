@@ -2,11 +2,27 @@
 
 import libs = glfw%lib{glfw}
 
+# Dependencies: source and header files from deps directory
+#
 libue{tinycthread}: {h c}{deps/tinycthread}
 libue{getopt}: {h c}{deps/getopt}
 libue{glad_gl}: h{deps/glad/gl}
 libue{glad_gles2}: h{deps/glad/gles2}
 libue{glad_vulkan}: h{deps/glad/vulkan}
+
+# Additional dependency headers that need to be distributed
+#
+./: h{deps/linmath               \
+       deps/nuklear              \
+       deps/nuklear_glfw_gl2     \
+       deps/stb_image_write}
+./: h{deps/mingw/_mingw_dxhelper \
+       deps/mingw/dinput         \
+       deps/mingw/xinput}
+
+# Distribute all dependency files
+#
+{h c}{deps/**}: dist = true
 
 console_tests = \
     allocator clipboard events msaa glfwinfo \
@@ -26,7 +42,7 @@ for n: $graphics_tests
 {
     ./: exe{$n}: c{$n} $libs
 
-    # if! 
+    # if!
     exe{$n}: libue{glad_gl}: include = ($n != triangle-vulkan)
 }
 
