@@ -121,7 +121,22 @@ if ($windows)
   switch $c.target.system: path.match
   {
     case '*msvc*'
+    {
       gl_libs += gdi32.lib
+
+      # Configure MSVC runtime library linkage.
+      #
+      if ($use_msvc_runtime_library_dll)
+      {
+        c.coptions += /MD
+        c.loptions += /MD
+      }
+      else
+      {
+        c.coptions += /MT
+        c.loptions += /MT
+      }
+    }
 
     default
       gl_libs += -lgdi32
@@ -151,11 +166,24 @@ if ($macos)
              -framework CoreFoundation
 }
 
+# Wayland-specific configuration
+#
+# Note that we distinguish between development and consumption builds to avoid
+# requiring `wayland-scanner` or protocol XMLs for downstream consumers.
+#
+# In development builds (`$develop == true`), we generate protocol headers and
+# code using `wayland-scanner` from upstream XML definitions under
+# `deps/wayland/`. Any regenerated files are compared against committed
+# pregenerated versions and copied into `pregenerated/glfw/` if changed.
+#
+# In consumption builds (`$develop == false`), we use only the pregenerated
+# protocol sources.
+#
 if ($build_wayland)
 {
   # Path to upstream Wayland protocol definitions.
   #
-  wayland_protos = $src_base/../deps/wayland
+  wayland = $src_base/../deps/wayland
 
   # Wayland support and baseline feature macros.
   #
@@ -174,151 +202,307 @@ if ($build_wayland)
              -ldl             \
              -lpthread
 
-  # Preserve Wayland protocol files in the distribution.
+  # Wayland protocols used for code generation.
   #
-  # NOTE: Attempts to express this more cleanly result in either:
-  #
-  #   error: multiple names on the left hand side of a pair
-  # or
-  #   error: out-qualified target pattern.
-  #
-  # The current approach is admittedly inelegant, but it works and it's
-  # reliable.
-  #
-  file{../deps/wayland/wayland.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/viewporter.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/xdg-shell.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/idle-inhibit-unstable-v1.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/pointer-constraints-unstable-v1.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/relative-pointer-unstable-v1.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/fractional-scale-v1.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/xdg-activation-v1.xml}@../deps/wayland/: dist = true
-  file{../deps/wayland/xdg-decoration-unstable-v1.xml}@../deps/wayland/: dist = true
+  protocols = wayland-client-protocol                         \
+              viewporter-client-protocol                      \
+              xdg-shell-client-protocol                       \
+              idle-inhibit-unstable-v1-client-protocol        \
+              pointer-constraints-unstable-v1-client-protocol \
+              relative-pointer-unstable-v1-client-protocol    \
+              fractional-scale-v1-client-protocol             \
+              xdg-activation-v1-client-protocol               \
+              xdg-decoration-unstable-v1-client-protocol
 }
 
-# Import the scanner executable used to generate protocol headers.
+# Wayland consumption build ($develop == false && $build_wayland == true).
 #
-import? scanner = wayland-scanner%exe{wayland-scanner}
 
-# Register all generated headers as part of the GLFW library interface.
+# Use pregenerated protocol headers in the consumption build.
 #
-lib{glfw}: h{wayland-client-protocol                                            \
-             wayland-client-protocol-code}                                      \
-                                                                                \
-            h{viewporter-client-protocol                                        \
-              viewporter-client-protocol-code}                                  \
-                                                                                \
-            h{xdg-shell-client-protocol                                         \
-              xdg-shell-client-protocol-code}                                   \
-                                                                                \
-            h{idle-inhibit-unstable-v1-client-protocol                          \
-              idle-inhibit-unstable-v1-client-protocol-code}                    \
-                                                                                \
-            h{pointer-constraints-unstable-v1-client-protocol                   \
-              pointer-constraints-unstable-v1-client-protocol-code}             \
-                                                                                \
-            h{relative-pointer-unstable-v1-client-protocol                      \
-              relative-pointer-unstable-v1-client-protocol-code}                \
-                                                                                \
-            h{fractional-scale-v1-client-protocol                               \
-              fractional-scale-v1-client-protocol-code}                         \
-                                                                                \
-            h{xdg-activation-v1-client-protocol                                 \
-              xdg-activation-v1-client-protocol-code}                           \
-                                                                                \
-            h{xdg-decoration-unstable-v1-client-protocol                        \
-              xdg-decoration-unstable-v1-client-protocol-code}:                 \
-                                                                                \
-  include = $build_wayland
+lib{glfw}: pregenerated/glfw/{h}{*}: include = (!$develop && $build_wayland)
+
+# Pregenerated protocol headers must be found first in the include path.
+#
+if (!$develop && $build_wayland)
+  c.poptions =+ "-I($src_base/pregenerated/glfw)"
+
+# Distribute pregenerated protocol headers only in the consumption build.
+#
+pregenerated/glfw/{h}{**}: dist = (!$develop && $build_wayland)
+
+# Wayland development build ($develop == true && $build_wayland == true).
+#
+
+# Use protocol headers directly in the development build.
+#
+lib{glfw}: {h}{$protocols}: include = ($develop && $build_wayland)
+
+# Import code generation tool from Wayland SDK.
+#
+if ($develop && $build_wayland)
+  import! scanner = wayland-scanner%exe{wayland-scanner}
+
+# Generate and track distribution for each protocol.
+#
+for f: $protocols
+{
+  d = $directory($f)
+  p = pregenerated/glfw
+
+  h{$f $f-code}:
+  {
+     dist = ($develop ? $relative([dir_path] "$p/$d", $d) : false)
+  }
+}
+
+# NOTE:
+#
+# Each protocol is handled in an individual rule block on purpose: the XML
+# filename, generated header, and generated code file names are not always
+# derived uniformly.
 
 # Wayland core protocol: base surface and input protocol.
 #
 <h{wayland-client-protocol} h{wayland-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/wayland.xml $path($>[0])
-  $scanner private-code  $wayland_protos/wayland.xml $path($>[1])
+  $scanner client-header $wayland/wayland.xml $path($>[0])
+  $scanner private-code  $wayland/wayland.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # Wayland viewport protocol: surface scaling and cropping.
 #
 <h{viewporter-client-protocol} h{viewporter-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/viewporter.xml $path($>[0])
-  $scanner private-code  $wayland_protos/viewporter.xml $path($>[1])
+  $scanner client-header $wayland/viewporter.xml $path($>[0])
+  $scanner private-code  $wayland/viewporter.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # XDG shell protocol: toplevel and popup window support.
 #
 <h{xdg-shell-client-protocol} h{xdg-shell-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/xdg-shell.xml $path($>[0])
-  $scanner private-code  $wayland_protos/xdg-shell.xml $path($>[1])
+  $scanner client-header $wayland/xdg-shell.xml $path($>[0])
+  $scanner private-code  $wayland/xdg-shell.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # Idle inhibit protocol: screen idle prevention for active surfaces.
 #
 <h{idle-inhibit-unstable-v1-client-protocol} h{idle-inhibit-unstable-v1-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/idle-inhibit-unstable-v1.xml $path($>[0])
-  $scanner private-code  $wayland_protos/idle-inhibit-unstable-v1.xml $path($>[1])
+  $scanner client-header $wayland/idle-inhibit-unstable-v1.xml $path($>[0])
+  $scanner private-code  $wayland/idle-inhibit-unstable-v1.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # Pointer constraints protocol: pointer lock and confinement.
 #
 <h{pointer-constraints-unstable-v1-client-protocol} h{pointer-constraints-unstable-v1-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/pointer-constraints-unstable-v1.xml $path($>[0])
-  $scanner private-code  $wayland_protos/pointer-constraints-unstable-v1.xml $path($>[1])
+  $scanner client-header $wayland/pointer-constraints-unstable-v1.xml $path($>[0])
+  $scanner private-code  $wayland/pointer-constraints-unstable-v1.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # Relative pointer protocol: input deltas from raw devices.
 #
 <h{relative-pointer-unstable-v1-client-protocol} h{relative-pointer-unstable-v1-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/relative-pointer-unstable-v1.xml $path($>[0])
-  $scanner private-code  $wayland_protos/relative-pointer-unstable-v1.xml $path($>[1])
+  $scanner client-header $wayland/relative-pointer-unstable-v1.xml $path($>[0])
+  $scanner private-code  $wayland/relative-pointer-unstable-v1.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # Fractional scale protocol: non-integer surface scaling factor support.
 #
 <h{fractional-scale-v1-client-protocol} h{fractional-scale-v1-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/fractional-scale-v1.xml $path($>[0])
-  $scanner private-code  $wayland_protos/fractional-scale-v1.xml $path($>[1])
+  $scanner client-header $wayland/fractional-scale-v1.xml $path($>[0])
+  $scanner private-code  $wayland/fractional-scale-v1.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # XDG activation protocol: surface focus and activation triggers.
 #
 <h{xdg-activation-v1-client-protocol} h{xdg-activation-v1-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/xdg-activation-v1.xml $path($>[0])
-  $scanner private-code  $wayland_protos/xdg-activation-v1.xml $path($>[1])
+  $scanner client-header $wayland/xdg-activation-v1.xml $path($>[0])
+  $scanner private-code  $wayland/xdg-activation-v1.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # XDG decoration protocol: client-side and server-side decoration control.
 #
 <h{xdg-decoration-unstable-v1-client-protocol} h{xdg-decoration-unstable-v1-client-protocol-code}>: $scanner
+%
+if ($develop && $build_wayland)
 {{
   diag wayland-scanner $>
 
-  $scanner client-header $wayland_protos/xdg-decoration-unstable-v1.xml $path($>[0])
-  $scanner private-code  $wayland_protos/xdg-decoration-unstable-v1.xml $path($>[1])
+  $scanner client-header $wayland/xdg-decoration-unstable-v1.xml $path($>[0])
+  $scanner private-code  $wayland/xdg-decoration-unstable-v1.xml $path($>[1])
+
+  # If the result differs from the pregenerated version, copy it over.
+  #
+  d = [dir_path] $src_base/pregenerated/glfw
+
+  dh = $d/$leaf($path($>[0]))
+  dc = $d/$leaf($path($>[1]))
+
+  if diff $dh $path($>[0]) >- && \
+     diff $dc $path($>[1]) >-
+    exit
+  end
+
+  cp $path($>[0]) $dh
+  cp $path($>[1]) $dc
 }}
 
 # X11-specific configuration

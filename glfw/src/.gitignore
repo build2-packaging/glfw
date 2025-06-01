@@ -1,2 +1,3 @@
-*-protocol.h
-*-protocol-code.h
+# Whitelist pregenerated output directory.
+#
+!pregenerated/glfw
