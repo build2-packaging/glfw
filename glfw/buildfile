@@ -1,5 +1,5 @@
-./: {*/ -build/ -deps/} doc{README.md} legal{LICENSE.md} manifest
+./: {*/ -build/ -deps/} doc{PACKAGE-README.md} manifest
 
 # Don't install tests.
 #
-# tests/: install = false
+tests/: install = false

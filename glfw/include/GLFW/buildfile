@@ -2,7 +2,6 @@ pub_hdrs = h{*}
 
 ./: $pub_hdrs
 
-
 # Install into the GLFW/ subdirectory of, say, /usr/include/
 # recreating subdirectories.
 #
