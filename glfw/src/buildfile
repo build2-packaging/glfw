@@ -148,8 +148,18 @@ if ($macos)
 {
   # macOS requires Clang compiler, so we check for it.
   #
-  if ($c.id != "*clang*")
-    fail "Unsupported compiler toolchain detected. macOS builds require Clang compiler."
+  # Note that we use 'switch ...: path.match' instead of a traditional 'if'
+  # because 'if ($c.id == "*clang*")' performs literal comparison, not pattern
+  # matching. This causes false negatives on CI or cross-toolchains where the
+  # compiler ID may include a prefix or suffix (e.g., 'arm64-apple-clang').
+  #
+  switch $c.id: path.match
+  {
+    case "*clang*"
+      c.coptions += # no-op
+    default
+      fail "Unsupported compiler toolchain detected. macOS builds require Clang compiler."
+  }
 
   # Add Cocoa-specific compiler options.
   #
@@ -161,7 +171,6 @@ if ($macos)
              -framework IOKit          \
              -framework CoreFoundation
 }
-
 
 # Wayland-specific configuration
 #
