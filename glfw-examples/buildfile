@@ -74,12 +74,12 @@ exe{*}: install = false
 
 # Link against the standard math library.
 #
-if ($c.target.class != 'windows')
+if ($linux || $freebsd)
   c.libs += "-lm"
 
 # Windows-specific build options.
 #
-if ($c.target.class == 'windows')
+if ($windows)
   c.poptions += -D_CRT_SECURE_NO_WARNINGS
 
 # TODO: Add icon resource definitions for Windows builds.

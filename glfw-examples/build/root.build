@@ -1,4 +1,7 @@
-using cc
+# Uncomment to suppress warnings coming from external libraries.
+#
+# c.internal.scope = current
+
 using c
 
 h{*}: extension = h
@@ -7,3 +10,10 @@ c{*}: extension = c
 # The test target for cross-testing (running tests under Wine, etc).
 #
 test.target = $c.target
+
+# Platform shorthands.
+#
+windows = ($c.target.class == 'windows')
+macos = ($c.target.class == 'macos')
+linux = ($c.target.class == 'linux')
+freebsd = ($c.target.class == 'freebsd')
