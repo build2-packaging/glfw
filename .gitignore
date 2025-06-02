@@ -4,27 +4,6 @@
 #
 .build2/local/
 
-# IDE support
-.vs
-.vscode
-compile_commands.json
-
-# Compiler/linker output.
+# Compilation database.
 #
-*.d
-*.t
-*.i
-*.ii
-*.o
-*.obj
-*.so
-*.dll
-*.a
-*.lib
-*.exp
-*.pdb
-*.ilk
-*.exe
-*.exe.dlls/
-*.exe.manifest
-*.pc
+compile_commands.json

@@ -1,63 +1,110 @@
 ./: manifest doc{README.md} legal{LICENSE.md}
 
+# External libraries.
+#
 import libs = glfw%lib{glfw}
 
-# Dependencies: source and header files from deps directory
+# Bundled third-party libraries.
 #
-libue{tinycthread}: {h c}{deps/tinycthread}
-libue{getopt}: {h c}{deps/getopt}
-libue{glad_gl}: h{deps/glad/gl}
-libue{glad_gles2}: h{deps/glad/gles2}
-libue{glad_vulkan}: h{deps/glad/vulkan}
+libue{tinycthread}:  {h c}{deps/tinycthread}
+libue{getopt}:       {h c}{deps/getopt}
+libue{glad_gl}:      {h  }{deps/glad/gl}
+libue{glad_gles2}:   {h  }{deps/glad/gles2}
+libue{glad_vulkan}:  {h  }{deps/glad/vulkan}
 
-# Additional dependency headers that need to be distributed
+# Header-only dependencies that must be distributed.
 #
-./: h{deps/linmath               \
-       deps/nuklear              \
-       deps/nuklear_glfw_gl2     \
-       deps/stb_image_write}
+./: h{deps/linmath          \
+      deps/nuklear          \
+      deps/nuklear_glfw_gl2 \
+      deps/stb_image_write}
+
+# Windows-specific headers for compatibility with MinGW toolchain.
+#
 ./: h{deps/mingw/_mingw_dxhelper \
-       deps/mingw/dinput         \
-       deps/mingw/xinput}
+      deps/mingw/dinput          \
+      deps/mingw/xinput}
 
-# Distribute all dependency files
+# Distribute all third-party source files (headers and sources).
 #
 {h c}{deps/**}: dist = true
 
-console_tests = \
-    allocator clipboard events msaa glfwinfo \
-    iconify monitors reopen cursor
-
-graphics_tests = \
-    empty gamma icon inputlag joysticks \
-    tearing threads timeout title triangle-vulkan window
+# Example programs
+#
+console_tests = allocator \
+                clipboard \
+                events    \
+                msaa      \
+                glfwinfo  \
+                iconify   \
+                monitors  \
+                reopen    \
+                cursor
 
 for n: $console_tests
-    ./: exe{$n}: c{$n} $libs libue{glad_gl}
+{
+  ./: exe{$n}: c{$n} libue{glad_gl} $libs
+}
 
-exe{clipboard events msaa glfwinfo iconify monitors}: libue{getopt}
-exe{glfwinfo}: libue{glad_vulkan}
+# Console tests with additional runtime dependencies.
+#
+exe{clipboard}: libue{getopt}
+exe{events}:    libue{getopt}
+exe{msaa}:      libue{getopt}
+exe{glfwinfo}:  libue{getopt}
+exe{iconify}:   libue{getopt}
+exe{monitors}:  libue{getopt}
+exe{glfwinfo}:  libue{glad_vulkan}
+
+# Graphics test executables.
+#
+graphics_tests = empty           \
+                 gamma           \
+                 icon            \
+                 inputlag        \
+                 joysticks       \
+                 tearing         \
+                 threads         \
+                 timeout         \
+                 title           \
+                 triangle-vulkan \
+                 window
 
 for n: $graphics_tests
 {
-    ./: exe{$n}: c{$n} $libs
+  ./: exe{$n}: c{$n} $libs
 
-    # if!
-    exe{$n}: libue{glad_gl}: include = ($n != triangle-vulkan)
+  # Use glad_gl by default except where Vulkan is used explicitly.
+  #
+  exe{$n}: libue{glad_gl}: include = ($n != triangle-vulkan)
 }
 
-exe{empty threads}: libue{tinycthread}
+# Additional runtime dependencies for specific graphics tests.
+#
+exe{empty}:           libue{tinycthread}
+exe{threads}:         libue{tinycthread}
 exe{triangle-vulkan}: libue{glad_vulkan}
-exe{inputlag}: libue{getopt}
+exe{inputlag}:        libue{getopt}
 
+# Associated test scripts for verification.
+#
 exe{glfwinfo}: testscript{glfwinfo}
 exe{monitors}: testscript{monitors}
 
+# Preprocessor search path for bundled headers.
+#
 c.poptions += "-I$src_root/deps/"
+
+# Prevent installation of test executables by default.
+#
 exe{*}: install = false
 
-c.libs += -lm
+# Link against the standard math library (libm).
+#
+if ($c.target.class != 'windows')
+  c.libs += -lm
 
+# Windows-specific compiler options.
+#
 if ($c.target.class == 'windows')
-    c.poptions += -D_CRT_SECURE_NO_WARNINGS
-
+  c.poptions += -D_CRT_SECURE_NO_WARNINGS
