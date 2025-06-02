@@ -52,8 +52,8 @@ for n: $examples
 
   # Default to GL backend unless the example explicitly uses GLES.
   #
-  if! $string.ends_with($n, opengles)
-    exe{$n}: libue{glad_gl}
+  gles = $string.ends_with($n, opengles)
+  exe{$n}: libue{glad_gl}: include = ($gles ? false : true)
 }
 
 # GLES variant requires glad_gles2 explicitly.
