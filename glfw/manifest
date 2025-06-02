@@ -5,7 +5,7 @@ examples: glfw-examples
 version: 3.4.0
 type: lib
 language: c
-summary: Multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop.
+summary: Multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop
 license: Zlib
 package-description-file: PACKAGE-README.md
 url: https://www.glfw.org

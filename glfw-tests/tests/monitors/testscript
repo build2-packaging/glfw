@@ -1,0 +1,3 @@
+: basic-execution
+:
+$* >- 2>- == 0

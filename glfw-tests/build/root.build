@@ -11,9 +11,12 @@ c{*}: extension = c
 #
 test.target = $c.target
 
-# Platform shorthands.
+# Every exe{} in this project is by default a test, but the majority are
+# interactive programs intended for manual execution and are not suitable for
+# automated test environments. To avoid running these programs in test
+# environments, we set test = false.
 #
-windows = ($c.target.class == 'windows')
-macos = ($c.target.class == 'macos')
-linux = ($c.target.class == 'linux')
-freebsd = ($c.target.class == 'freebsd')
+# Some exceptions apply: tests designed for non-interactive execution, that is,
+# driver executables with an associated testscript, are enabled explicitly.
+#
+exe{*}: test = false
