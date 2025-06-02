@@ -47,8 +47,12 @@ On **Debian 12** and **later**, the required development packages are typically 
 
 Finally, on **other Linux distributions**, you may need to install the equivalent development packages manually. Refer to your system's package manager for how to install the following libraries:
 
-* Xcursor
-* Xi
-* Xinerama
-* Xrandr
-* xkbcommon
+* libXcursor
+* libXi
+* libXinerama
+* libXrandr
+* libxkbcommon
+
+###### Wayland
+
+* libwayland
