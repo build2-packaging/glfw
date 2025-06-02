@@ -180,7 +180,7 @@ if ($build_wayland)
 {
   # Path to upstream Wayland protocol definitions.
   #
-  wayland = $src_base/../deps/wayland
+  wayland = $src_root/../upstream/deps/wayland
 
   # Wayland support and baseline feature macros.
   #

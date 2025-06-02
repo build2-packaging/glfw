@@ -1,0 +1,3 @@
+import libs = glfw%lib{glfw}
+
+exe{driver}: {h c}{**} $libs testscript{**}
