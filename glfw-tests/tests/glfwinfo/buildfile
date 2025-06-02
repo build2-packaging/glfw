@@ -1,0 +1,24 @@
+import libs = glfw%lib{glfw}
+
+# Bundled third-party libraries.
+#
+libue{tinycthread}: obje{tinycthread}: {h c}{"$src_root"/../upstream/deps/tinycthread}
+libue{getopt}:      obje{getopt}:      {h c}{"$src_root"/../upstream/deps/getopt}
+libue{glad_gl}:                        {h  }{"$src_root"/../upstream/deps/glad/gl}
+libue{glad_vulkan}:                    {h  }{"$src_root"/../upstream/deps/glad/vulkan}
+
+# Preprocessor search path for bundled headers.
+#
+c.poptions += -I"$src_root"/../upstream/deps/
+
+# Link against the standard math library (libm).
+#
+if ($c.target.class != 'windows')
+  c.libs += -lm
+
+./: exe{driver}: {h c}{**} libue{getopt} libue{glad_gl} libue{glad_vulkan} \
+  $libs testscript
+
+# Testscript.
+#
+exe{driver}: test = true

@@ -1,6 +1,6 @@
 project = glfw-tests
 
+using version
 using config
 using test
 using dist
-using version

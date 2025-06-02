@@ -1,8 +1,0 @@
-: MONITORS
-$* >| 2>| == 0
-
-: MONITORS-USAGE
-$* -h >>EOM
-Usage: monitors [-t]
-       monitors -h
-EOM

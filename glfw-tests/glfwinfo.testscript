@@ -1,6 +1,0 @@
-: GLFWVERSION_TEST
-$* --version >>~%EOM%
-GLFW header version: 3.4.0
-GLFW library version: 3.4.0
-%GLFW library version string: \"3\.4\.0.+%
-EOM

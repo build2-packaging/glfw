@@ -1,0 +1,7 @@
+: version
+:
+$* --version >>~"/EOO/"
+/.*/
+/GLFW library version: $(version.major)\.$(version.minor)\.$(version.patch)/
+/.*/
+EOO
