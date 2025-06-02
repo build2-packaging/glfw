@@ -18,15 +18,26 @@ depends: * bpkg >= 0.17.0
 
 # CI
 #
+# FIXME: We explicitly exclude `bindist` builds globally, but they still seem to
+# be included in the `sys` meta-builds (e.g., `debian-wayland-builds: sys`), and
+# thus end up running on CI. This is unintended.
+#
+# A similar issue occurs with `-static` builds: even though we exclude them
+# using `*-exclude: *-static**`, they still get included through the `sys` group
+# and are built on CI. We do not support such configurations.
+#
+# We need to investigate how inclusion/exclusion rules interact when using
+# meta-builds like `sys`, and ensure that excluded builds are *actually* omitted
+# from all CI jobs.
 
-builds: -freebsd ; supported in principle, but Wayland and X11 libraries must be installed manually.
+builds: -freebsd
 builds: -linux
 builds: -macos
 builds: -bindist
 
 debian-wayland-builds: sys
 debian-wayland-build-include: linux_debian_12-**
-debian-wayland-build-exclude: linux_debian_12-*-static** ; static builds not supported.
+debian-wayland-build-exclude: linux_debian_12-*-static**
 debian-wayland-build-exclude: **
 debian-wayland-build-config:
 \
@@ -35,7 +46,7 @@ config.glfw.build_wayland=true
 \
 
 debian-x11-builds: sys
-debian-x11-build-include: linux_debian*-** ; available on all debian versions.
+debian-x11-build-include: linux_debian*-**
 debian-x11-build-exclude: **
 debian-x11-build-config:
 \
@@ -43,7 +54,7 @@ config.glfw.build_x11=true
 \
 
 fedora-wayland-builds: sys
-fedora-wayland-build-include: linux_fedora*-** ; available on all fedora versions.
+fedora-wayland-build-include: linux_fedora*-**
 fedora-wayland-build-exclude: **
 fedora-wayland-build-config:
 \
@@ -70,5 +81,5 @@ sys:libxkbcommon
 \
 
 macos-clang-builds: macos
-macos-clang-build-include: macos_*-clang ; only clang is supported with objective-c 2.0.
+macos-clang-build-include: macos_*-clang
 macos-clang-build-exclude: **
