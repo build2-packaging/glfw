@@ -27,6 +27,7 @@ builds: -bindist
 debian-wayland-builds: sys
 debian-wayland-build-include: linux_debian_12-**
 debian-wayland-build-exclude: linux_debian_12-*-static** ; static builds not supported.
+debian-wayland-build-exclude: **
 debian-wayland-build-config:
 \
 config.glfw.build_x11=true
