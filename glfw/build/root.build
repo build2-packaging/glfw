@@ -4,8 +4,6 @@ using in
 #
 # c.internal.scope = current
 
-c.std = 99
-
 using c
 using c.objc
 
@@ -22,7 +20,7 @@ test.target = $c.target
 config [bool] config.glfw.develop ?= false
 develop = $config.glfw.develop # shorthand
 
-# Platform shorthand
+# Platform shorthands.
 #
 windows = ($c.target.class == 'windows')
 macos = ($c.target.class == 'macos')
@@ -39,7 +37,7 @@ config [bool, config.report] config.glfw.build_wayland ?= false
 config [bool, config.report] config.glfw.use_hybrid_hpg ?= false
 config [bool, config.report] config.glfw.use_msvc_runtime_library_dll ?= false
 
-# Upstream options shorthand.
+# Upstream options shorthands.
 #
 build_x11 = $config.glfw.build_x11
 build_wayland = $config.glfw.build_wayland

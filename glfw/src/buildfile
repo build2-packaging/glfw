@@ -113,6 +113,18 @@ c.poptions =+ "-I$out_pfx_src" \
 #
 gl_libs =
 
+# Linux-specific configuration
+#
+if ($linux || $freebsd)
+{
+  # Required system libraries for Linux/FreeBSD.
+  #
+  gl_libs += -lm  \
+             -lrt \
+             -ldl \
+             -lpthread
+}
+
 # Windows-specific configuration
 #
 if ($windows)
@@ -137,10 +149,7 @@ if ($macos)
   # macOS requires Clang compiler, so we check for it.
   #
   if ($c.id != "*clang*")
-  {
-    fail "Unsupported compiler toolchain detected. macOS builds require Clang compiler. \
-          Please configure your build environment to use Clang or switch to a supported platform."
-  }
+    fail "Unsupported compiler toolchain detected. macOS builds require Clang compiler."
 
   # Add Cocoa-specific compiler options.
   #
@@ -152,6 +161,7 @@ if ($macos)
              -framework IOKit          \
              -framework CoreFoundation
 }
+
 
 # Wayland-specific configuration
 #
@@ -179,15 +189,12 @@ if ($build_wayland)
   # Required system and user-space client libraries for Wayland.
   #
   # NOTE: libwayland should eventually be packaged as a build2 package. For now,
-  #       we assume it is installed in the system or user environment.
+  #       we assume it's installed in the system or user environment.
   #
   gl_libs += -lwayland-client \
              -lwayland-cursor \
-             -lwayland-egl    \
-             -lrt             \
-             -lm              \
-             -ldl             \
-             -lpthread
+             -lwayland-egl
+
 
   # Wayland protocols used for code generation.
   #
@@ -500,11 +507,7 @@ if ($build_x11)
 
   # Required system libraries for X11 backend.
   #
-  gl_libs += -lrt  \
-             -lm   \
-             -ldl  \
-             -lX11 \
-             -lpthread
+  gl_libs += -lX11
 }
 
 # Enable hybrid GPU support when requested

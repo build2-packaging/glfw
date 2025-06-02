@@ -101,10 +101,10 @@ exe{*}: install = false
 
 # Link against the standard math library (libm).
 #
-if ($c.target.class != 'windows')
+if ($linux || $freebsd)
   c.libs += -lm
 
 # Windows-specific compiler options.
 #
-if ($c.target.class == 'windows')
+if ($windows)
   c.poptions += -D_CRT_SECURE_NO_WARNINGS
