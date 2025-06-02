@@ -1,4 +1,9 @@
-./: {*/ -build/} manifest
+./: {*/ -build/ -deps/} manifest
+
+# Mark all third-party source files (headers and sources) under deps/ for
+# distribution.
+#
+./: {h c}{deps/**}: dist = true
 
 # Don't install tests.
 #

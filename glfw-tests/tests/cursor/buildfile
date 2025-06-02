@@ -2,13 +2,13 @@ import libs = glfw%lib{glfw}
 
 # Bundled third-party libraries.
 #
-libue{tinycthread}: obje{tinycthread}: {h c}{"$src_root"/../upstream/deps/tinycthread}
-libue{getopt}: obje{getopt}:           {h c}{"$src_root"/../upstream/deps/getopt}
-libue{glad_gl}:                        {h  }{"$src_root"/../upstream/deps/glad/gl}
+./: libue{tinycthread}: {h c}{"$src_root"/deps/tinycthread}
+./: libue{getopt}: {h c}{"$src_root"/deps/getopt}
+./: libue{glad_gl}:                        {h  }{"$src_root"/deps/glad/gl}
 
 # Preprocessor search path for bundled headers.
 #
-c.poptions += -I"$src_root"/../upstream/deps/
+c.poptions += -I"$src_root"/deps/
 
 # Link against the standard math library (libm).
 #

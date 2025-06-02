@@ -2,11 +2,11 @@ import libs = glfw%lib{glfw}
 
 # Bundled third-party libraries.
 #
-libue{glad_gles2}: {h}{"$src_root"/../upstream/deps/glad/gles2}
+./: libue{glad_gles2}: {h}{"$src_root"/deps/glad/gles2}
 
 # Preprocessor search path for bundled headers.
 #
-c.poptions += -I"$src_root"/../upstream/deps/
+c.poptions += -I"$src_root"/deps/
 
 # Link against the standard math library (libm).
 #
