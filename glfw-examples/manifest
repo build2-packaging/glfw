@@ -13,3 +13,29 @@ package-url: https://github.com/build2-packaging/glfw
 package-email: packaging@build2.org ; Mailing list.
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
+
+# CI Configuration
+#
+
+# Build matrix: all supported configurations.
+#
+builds: all
+
+# Exclude FreeBSD
+#
+# At present, FreeBSD is the only unsupported platform in CI. This is due to
+# missing dependencies required to build GLFW, namely, Wayland and X11
+# libraries. These are not currently available through FreeBSD package
+# manager in a form that 'bdep' can consume automatically.
+#
+builds: -freebsd
+
+# Exclude macOS GCC builds due to lack of Objective-C 2.0 support.
+#
+# GCC does not support Objective-C 2.0, which is a requirement for building on
+# macOS (e.g., when linking against Cocoa APIs).
+#
+builds: -macos
+macos-clang-builds: macos
+macos-clang-build-include: macos_*-clang
+macos-clang-build-exclude: **
