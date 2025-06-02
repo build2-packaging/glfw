@@ -1,4 +1,4 @@
-./: {*/ -build/ -deps/} doc{PACKAGE-README.md} doc{README.md} legal{LICENSE.md} manifest
+./: {*/ -build/} doc{PACKAGE-README.md README.md} legal{LICENSE.md} manifest
 
 # Don't install tests.
 #
