@@ -1,21 +1,3 @@
-# Drivers
-boing
-gears
-heightmap
-offscreen
-particles
-sharing
-simple
-splitview
-wave
-triangle-opengl
-triangle-opengles
-windows
-
-# Output files
-offscreen.png
-
-# Testscript output directories (can be symlinks).
+# Test executables.
 #
-test
-test-*
+driver

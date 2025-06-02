@@ -1,14 +1,15 @@
 : 1
 name: glfw-examples
 version: 3.4.0
+type: examples
+language: c
 project: glfw
-summary: GLFW examples library
+summary: Multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop ; examples
 license: Zlib
-description-file: README.md
 url: https://www.glfw.org
-package-url: https://github.com/Swat-SomeBug/glfw.git
-email: packaging@build2.org ; Mailing list.
+doc-url: https://www.glfw.org/docs/latest/
+src-url: https://github.com/glfw/glfw
+package-url: https://github.com/build2-packaging/glfw
+package-email: packaging@build2.org ; Mailing list.
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
-requires: ; OpengGL libraries. Usually installed with system or SDK on Windows.
-requires: ; X11 and Wayland when building for Linux

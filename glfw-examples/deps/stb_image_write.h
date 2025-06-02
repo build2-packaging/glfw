@@ -1,1 +1,0 @@
-../../upstream/deps/stb_image_write.h
