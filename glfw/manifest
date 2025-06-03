@@ -16,19 +16,8 @@ package-email: packaging@build2.org ; Mailing list.
 depends: * build2 >= 0.17.0
 depends: * bpkg >= 0.17.0
 
-# CI
+# CI configuration
 #
-# FIXME: We explicitly exclude `bindist` builds globally, but they still seem to
-# be included in the `sys` meta-builds (e.g., `debian-wayland-builds: sys`), and
-# thus end up running on CI. This is unintended.
-#
-# A similar issue occurs with `-static` builds: even though we exclude them
-# using `*-exclude: *-static**`, they still get included through the `sys` group
-# and are built on CI. We do not support such configurations.
-#
-# We need to investigate how inclusion/exclusion rules interact when using
-# meta-builds like `sys`, and ensure that excluded builds are *actually* omitted
-# from all CI jobs.
 
 builds: -freebsd
 builds: -linux
@@ -36,8 +25,9 @@ builds: -macos
 builds: -bindist
 
 debian-wayland-builds: sys
+debian-wayland-builds: -static
+debian-wayland-builds: -bindist
 debian-wayland-build-include: linux_debian_12-**
-debian-wayland-build-exclude: linux_debian_12-*-static**
 debian-wayland-build-exclude: **
 debian-wayland-build-config:
 \
@@ -46,6 +36,8 @@ config.glfw.build_wayland=true
 \
 
 debian-x11-builds: sys
+debian-x11-builds: -static
+debian-x11-builds: -bindist
 debian-x11-build-include: linux_debian*-**
 debian-x11-build-exclude: **
 debian-x11-build-config:
@@ -54,6 +46,8 @@ config.glfw.build_x11=true
 \
 
 fedora-wayland-builds: sys
+fedora-wayland-builds: -static
+fedora-wayland-builds: -bindist
 fedora-wayland-build-include: linux_fedora*-**
 fedora-wayland-build-exclude: **
 fedora-wayland-build-config:
@@ -63,6 +57,8 @@ config.glfw.build_wayland=true
 \
 
 fedora-x11-builds: sys
+fedora-x11-builds: -static
+fedora-x11-builds: -bindist
 fedora-x11-build-include: linux_fedora*-**
 fedora-x11-build-exclude: **
 fedora-x11-build-config:
