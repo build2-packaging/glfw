@@ -37,6 +37,7 @@ bdep init -C @gcc cc config.cxx=g++ -- config.glfw.build_x11=true \
                               sys:libXinerama                     \
                               sys:libXrandr                       \
                               sys:libxkbcommon                    \
+                              sys:mesa-libGL
 ```
 
 #### Debian
