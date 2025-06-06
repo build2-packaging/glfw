@@ -22,3 +22,16 @@
 # the repository's language statistics and hidden by default in diffs.
 #
 glfw/src/pregenerated/glfw/** linguist-generated=true
+
+# Note that unlike POSIX, Windows distinguishes between file symlinks and
+# directory symlinks. However, git does not record the symlink type and will
+# always attempt to create a file symlink. As a result, if a directory symlink
+# is used by a project and such a project is developed on Windows, then the type
+# of this symlink needs to be explicitly specified in the .gitattributes file
+# (see the relevant git commit for details). For example, if src/ is a symlink
+# that points to upstream/src/, then we need to add `src symlink=dir`.
+#
+# build2.org/article/symlinks.xhtml
+#
+glfw-examples/deps symlink=dir
+glfw-tests/deps symlink=dir
