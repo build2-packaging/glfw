@@ -53,6 +53,7 @@ Finally, on **other Linux distributions**, you may need to install the equivalen
 * libXinerama
 * libXrandr
 * libxkbcommon
+* mesa-libGL
 
 ###### Wayland
 
