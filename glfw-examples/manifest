@@ -1,6 +1,6 @@
 : 1
 name: glfw-examples
-version: 3.4.0
+version: 3.4.0+1
 type: examples
 language: c
 project: glfw

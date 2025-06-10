@@ -230,9 +230,17 @@ lib{glfw}: pregenerated/glfw/{h}{*}: include = (!$develop && $build_wayland)
 if (!$develop && $build_wayland)
   c.poptions =+ "-I($src_base/pregenerated/glfw)"
 
-# Distribute pregenerated protocol headers only in the consumption build.
+# Always distribute pregenerated protocol headers in consumption builds.
 #
-pregenerated/glfw/{h}{**}: dist = (!$develop && $build_wayland)
+# Consumption build must always include pregenerated headers, regardless of the
+# current Wayland configuration to avoids failure cases where CI or other
+# generates a distribution archive without X11 or Wayland enabled, then later
+# attempts to consume that archive in a Wayland-enabled configuration. Without
+# the pregenerated headers, such use would fail.
+#
+# https://github.com/build2-packaging/glfw/issues/15
+#
+pregenerated/glfw/{h}{**}: dist = (!$develop)
 
 # Wayland development build ($develop == true && $build_wayland == true).
 #

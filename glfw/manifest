@@ -2,7 +2,7 @@
 name: glfw
 tests: glfw-tests
 examples: glfw-examples
-version: 3.4.0
+version: 3.4.0+1
 type: lib
 language: c
 summary: Multi-platform library for OpenGL, OpenGL ES and Vulkan development on the desktop
