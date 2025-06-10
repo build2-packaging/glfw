@@ -1,0 +1,9 @@
+: 1
+name: glfw-tests
+version: 3.4.0+1
+type: tests
+language: c
+project: glfw
+summary: Multi-platform library for OpenGL, OpenGL ES and Vulkan development\
+ on the desktop ; tests
+license: Zlib
