@@ -83,14 +83,14 @@ lib{glfw}: c{x11_init       \
              x11_monitor    \
              x11_window     \
              glx_context}   \
-           h{x11_platform}: include = ($linux || $freebsd)
+           h{x11_platform}: include = ($build_x11)
 
 # Unix - Wayland backend
 #
 lib{glfw}: c{wl_init       \
              wl_monitor    \
              wl_window}    \
-           h{wl_platform}: include = ($linux || $freebsd)
+           h{wl_platform}: include = ($build_wayland)
 
 # Linux-specific joystick support
 #
