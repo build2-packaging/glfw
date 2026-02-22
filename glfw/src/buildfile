@@ -223,7 +223,7 @@ if ($build_wayland)
 
 # Use pregenerated protocol headers in the consumption build.
 #
-lib{glfw}: pregenerated/glfw/{h}{*}: include = (!$develop && $build_wayland)
+lib{glfw}: pregenerated/glfw/{h}{**}: include = (!$develop && $build_wayland)
 
 # Pregenerated protocol headers must be found first in the include path.
 #
@@ -240,7 +240,7 @@ if (!$develop && $build_wayland)
 #
 # https://github.com/build2-packaging/glfw/issues/15
 #
-pregenerated/glfw/{h}{**}: dist = (!$develop)
+pregenerated/glfw/{h}{**}: dist = (!$develop || !$build_wayland)
 
 # Wayland development build ($develop == true && $build_wayland == true).
 #
