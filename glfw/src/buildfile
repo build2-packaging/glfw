@@ -75,7 +75,7 @@ lib{glfw}: c{posix_time    \
            h{posix_time    \
              posix_thread  \
              posix_poll    \
-             xkb_unicode}: include = ($linux || $freebsd)
+             xkb_unicode}: include = ($linux || $bsd)
 
 # Unix - X11 backend
 #
@@ -115,7 +115,7 @@ gl_libs =
 
 # Linux-specific configuration
 #
-if ($linux || $freebsd)
+if ($linux || $bsd)
 {
   # Required system libraries for Linux/FreeBSD.
   #

@@ -25,7 +25,7 @@ develop = $config.glfw.develop # shorthand
 windows = ($c.target.class == 'windows')
 macos = ($c.target.class == 'macos')
 linux = ($c.target.class == 'linux')
-freebsd = ($c.target.class == 'freebsd')
+bsd = ($c.target.class == 'bsd')
 
 # Upstream options.
 #
